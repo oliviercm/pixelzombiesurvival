@@ -466,8 +466,8 @@ let game = {
     mouseY: 0,
     mouseClick: false,
     camera: { x: 0, y: 0 },
-    worldWidth: 2400,
-    worldHeight: 1600
+    worldWidth: 1800,
+    worldHeight: 1200
 };
 
 // ============================================
@@ -1049,15 +1049,29 @@ function initGame() {
 function spawnZombie() {
     if (game.zombies.length >= CONFIG.MAX_ZOMBIES) return;
 
-    // Random position around the player (at edge of view)
-    const angle = Math.random() * Math.PI * 2;
-    const distance = Math.max(CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT) / 2 + 50;
-    let x = game.player.x + Math.cos(angle) * distance;
-    let y = game.player.y + Math.sin(angle) * distance;
+    // Spawn on a random edge of the arena
+    const edge = Math.floor(Math.random() * 4);
+    const padding = 5;
+    let x, y;
 
-    // Clamp to world bounds
-    x = Math.max(20, Math.min(game.worldWidth - 20, x));
-    y = Math.max(20, Math.min(game.worldHeight - 20, y));
+    switch (edge) {
+        case 0: // top edge
+            x = Math.random() * (game.worldWidth + padding * 2) - padding;
+            y = 0 - padding;
+            break;
+        case 1: // bottom edge
+            x = Math.random() * (game.worldWidth + padding * 2) - padding;
+            y = game.worldHeight - padding;
+            break;
+        case 2: // left edge
+            x = 0 - padding;
+            y = Math.random() * (game.worldHeight + padding * 2) - padding;
+            break;
+        case 3: // right edge
+            x = game.worldWidth - padding;
+            y = Math.random() * (game.worldHeight + padding * 2) - padding;
+            break;
+    }
 
     // Determine zombie type using weighted random selection from ZombieTypes config
     const zombieTypeNames = Object.keys(ZombieTypes);
