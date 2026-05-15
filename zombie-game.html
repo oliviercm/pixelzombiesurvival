@@ -809,7 +809,8 @@ class Zombie {
         
         // Apply stats from configuration
         this.speed = zombieConfig.speed;
-        this.health = zombieConfig.health;
+        const healthVariation = 0.8 + Math.random() * 0.4;
+        this.health = Math.round(zombieConfig.health * healthVariation);
         this.maxHealth = this.health;
         this.damage = zombieConfig.damage;
         this.colors = zombieConfig.colors;
