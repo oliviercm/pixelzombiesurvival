@@ -252,6 +252,8 @@ const CONFIG = {
     AMMO_PICKUP_AMOUNT: 10,
     HEALTH_PICKUP_AMOUNT: 25,
     CURSOR_SIZE: 8,
+    ZOMBIE_SPAWN_GROUP_MIN: 3,
+    ZOMBIE_SPAWN_GROUP_MAX: 5,
 };
 
 // ============================================
@@ -1207,10 +1209,14 @@ function gameLoop() {
     // Update camera
     updateCamera();
 
-    // Spawn zombies
+    // Spawn zombies in groups
     if (now - game.lastZombieSpawn > CONFIG.ZOMBIE_SPAWN_INTERVAL && game.zombiesToSpawn > 0) {
-        spawnZombie();
-        game.zombiesToSpawn--;
+        const groupSize = Math.floor(Math.random() * (CONFIG.ZOMBIE_SPAWN_GROUP_MAX - CONFIG.ZOMBIE_SPAWN_GROUP_MIN + 1)) + CONFIG.ZOMBIE_SPAWN_GROUP_MIN;
+        const actualSpawn = Math.min(groupSize, game.zombiesToSpawn);
+        for (let i = 0; i < actualSpawn; i++) {
+            spawnZombie();
+        }
+        game.zombiesToSpawn -= actualSpawn;
         game.lastZombieSpawn = now;
     }
 
