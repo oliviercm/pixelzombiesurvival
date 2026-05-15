@@ -423,6 +423,121 @@ let game = {
 };
 
 // ============================================
+// SOUND ENGINE - Web Audio API Synthesized Sounds
+// ============================================
+const SoundEngine = {
+    audioContext: null,
+    initialized: false,
+
+    // Initialize the AudioContext (must be called after user interaction due to browser autoplay policy)
+    init() {
+        if (this.initialized) return;
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.initialized = true;
+        } catch (e) {
+            console.warn('Web Audio API not supported');
+        }
+    },
+
+    // Resume AudioContext if suspended (browser policy)
+    resume() {
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+    },
+
+    // Play a noise-based sound (gunshot, impact)
+    playNoise(duration, frequency, volume, decay) {
+        if (!this.audioContext) return;
+        this.resume();
+
+        const bufferSize = this.audioContext.sampleRate * duration;
+        const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        // Generate white noise
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * decay));
+        }
+
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+
+        // Filter to shape the sound
+        const filter = this.audioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = frequency;
+
+        // Volume control
+        const gainNode = this.audioContext.createGain();
+        gainNode.gain.value = volume;
+
+        source.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        source.start();
+        source.stop(this.audioContext.currentTime + duration);
+    },
+
+    // Play a tone-based sound (damage, pickup)
+    playTone(frequency, duration, volume, type = 'sine') {
+        if (!this.audioContext) return;
+        this.resume();
+
+        const oscillator = this.audioContext.createOscillator();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+
+        const gainNode = this.audioContext.createGain();
+        gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        oscillator.start();
+        oscillator.stop(this.audioContext.currentTime + duration);
+    },
+
+    // ============================================
+    // SOUND EFFECTS
+    // ============================================
+
+    // Gunshot sound - short noise burst
+    playShoot() {
+        this.playNoise(0.15, 1000, 0.3, 0.05);
+    },
+
+    // Player taking damage - descending tone
+    playDamage() {
+        if (!this.audioContext) return;
+        this.resume();
+
+        const oscillator = this.audioContext.createOscillator();
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.2);
+
+        const gainNode = this.audioContext.createGain();
+        gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.2);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        oscillator.start();
+        oscillator.stop(this.audioContext.currentTime + 0.2);
+    },
+
+    // Bullet hitting zombie - sharp impact noise
+    playHit() {
+        this.playNoise(0.08, 2000, 0.25, 0.03);
+    }
+};
+
+// ============================================
 // INPUT HANDLING
 // ============================================
 const keys = {};
@@ -526,6 +641,9 @@ class Player {
         weapon.currentAmmo--;
         this.lastShot = now;
 
+        // Play shoot sound
+        SoundEngine.playShoot();
+
         // Create bullets based on weapon type
         for (let i = 0; i < weapon.bulletCount; i++) {
             const spreadAngle = (Math.random() - 0.5) * weapon.spread * 2;
@@ -568,6 +686,9 @@ class Player {
 
         this.health -= amount;
         this.invincibleTimer = 500; // Half second invincibility
+
+        // Play damage sound
+        SoundEngine.playDamage();
 
         // Create damage particles
         for (let i = 0; i < 5; i++) {
@@ -821,6 +942,9 @@ function initGame() {
     game.canvas.width = CONFIG.CANVAS_WIDTH;
     game.canvas.height = CONFIG.CANVAS_HEIGHT;
 
+    // Initialize sound engine (must be called after user interaction)
+    SoundEngine.init();
+
     // Reset game state
     game.player = new Player(game.worldWidth / 2, game.worldHeight / 2);
     game.bullets = [];
@@ -964,6 +1088,9 @@ function updateBullets() {
             if (dist < bullet.size + zombie.width / 2) {
                 hit = true;
                 const killed = zombie.takeDamage(bullet.damage);
+
+                // Play bullet hit sound
+                SoundEngine.playHit();
 
                 // Create explosion if applicable
                 if (bullet.explosionRadius > 0) {
