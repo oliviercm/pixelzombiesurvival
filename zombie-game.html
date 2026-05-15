@@ -249,6 +249,9 @@ const CONFIG = {
     ZOMBIES_PER_WAVE: 10,
     MAX_ZOMBIES: 50,
     DEMON_ZOMBIE_CHANCE: 0.2,
+    FAST_ZOMBIE_CHANCE: 0.15,
+    ZOMBIE_FAST_SPEED: 2,
+    ZOMBIE_FAST_HEALTH: 20,
     AMMO_PICKUP_AMOUNT: 10,
     HEALTH_PICKUP_AMOUNT: 25,
     CURSOR_SIZE: 8,
@@ -747,16 +750,31 @@ class Player {
  * Zombie class - AI enemy that chases the player
  */
 class Zombie {
-    constructor(x, y, isDemon = false) {
+    constructor(x, y, type = 'normal') {
         this.x = x;
         this.y = y;
         this.width = CONFIG.ZOMBIE_SIZE;
         this.height = CONFIG.ZOMBIE_SIZE;
-        this.isDemon = isDemon;
-        this.speed = isDemon ? CONFIG.ZOMBIE_DEMON_SPEED : CONFIG.ZOMBIE_BASE_SPEED;
-        this.health = isDemon ? 30 : 40;
+        this.type = type;
+        this.isDemon = type === 'demon';
+        this.isFast = type === 'fast';
+        
+        // Set stats based on zombie type
+        if (this.isDemon) {
+            this.speed = CONFIG.ZOMBIE_DEMON_SPEED;
+            this.health = 30;
+            this.damage = CONFIG.ZOMBIE_DEMON_DAMAGE;
+        } else if (this.isFast) {
+            this.speed = CONFIG.ZOMBIE_FAST_SPEED;
+            this.health = CONFIG.ZOMBIE_FAST_HEALTH;
+            this.damage = CONFIG.ZOMBIE_NORMAL_DAMAGE;
+        } else {
+            this.speed = CONFIG.ZOMBIE_BASE_SPEED;
+            this.health = 40;
+            this.damage = CONFIG.ZOMBIE_NORMAL_DAMAGE;
+        }
+        
         this.maxHealth = this.health;
-        this.damage = isDemon ? CONFIG.ZOMBIE_DEMON_DAMAGE : CONFIG.ZOMBIE_NORMAL_DAMAGE;
         this.hitTimer = 0;
         this.attackCooldown = 1000;
         this.lastAttack = 0;
@@ -801,13 +819,13 @@ class Zombie {
                 vy: (Math.random() - 0.5) * 3,
                 life: 200,
                 maxLife: 200,
-                color: this.isDemon ? '#ff0000' : '#888888',
+                color: this.isDemon ? '#ff0000' : this.isFast ? '#ffff00' : '#888888',
                 size: 2
             });
         }
 
         if (this.health <= 0) {
-            // Create death particles
+            // Create death particles (color based on zombie type)
             for (let i = 0; i < 10; i++) {
                 game.particles.push({
                     x: this.x,
@@ -816,7 +834,7 @@ class Zombie {
                     vy: (Math.random() - 0.5) * 5,
                     life: 500,
                     maxLife: 500,
-                    color: this.isDemon ? '#aa0000' : '#666666',
+                    color: this.isDemon ? '#aa0000' : (this.isFast ? '#ffdd00' : '#666666'),
                     size: 3
                 });
             }
@@ -836,17 +854,19 @@ class Zombie {
             return;
         }
 
-        // Draw zombie body
-        const color = this.hitTimer > 0 ? '#ffffff' : (this.isDemon ? '#cc0000' : '#888888');
-        ctx.fillStyle = color;
+        // Draw zombie body (color based on type)
+        const bodyColor = this.hitTimer > 0 ? '#ffffff' : (this.isDemon ? '#cc0000' : this.isFast ? '#ffff00' : '#888888');
+        ctx.fillStyle = bodyColor;
         ctx.fillRect(screenX - this.width/2, screenY - this.height/2, this.width, this.height);
 
         // Draw zombie head
-        ctx.fillStyle = this.hitTimer > 0 ? '#ffffff' : (this.isDemon ? '#aa0000' : '#777777');
+        const headColor = this.hitTimer > 0 ? '#ffffff' : (this.isDemon ? '#aa0000' : this.isFast ? '#ffdd00' : '#777777');
+        ctx.fillStyle = headColor;
         ctx.fillRect(screenX - 7, screenY - this.height/2 - 10, 14, 12);
 
         // Draw eyes
-        ctx.fillStyle = this.isDemon ? '#ff0000' : '#00ff00';
+        const eyeColor = this.isDemon ? '#ff0000' : (this.isFast ? '#ff0000' : '#00ff00');
+        ctx.fillStyle = eyeColor;
         ctx.fillRect(screenX - 5, screenY - this.height/2 - 7, 3, 3);
         ctx.fillRect(screenX + 2, screenY - this.height/2 - 7, 3, 3);
 
@@ -854,7 +874,8 @@ class Zombie {
         const healthPercent = this.health / this.maxHealth;
         ctx.fillStyle = '#333333';
         ctx.fillRect(screenX - 12, screenY - this.height/2 - 16, 24, 3);
-        ctx.fillStyle = this.isDemon ? '#ff0000' : '#888888';
+        const healthBarColor = this.isDemon ? '#ff0000' : (this.isFast ? '#ffff00' : '#888888');
+        ctx.fillStyle = healthBarColor;
         ctx.fillRect(screenX - 12, screenY - this.height/2 - 16, 24 * healthPercent, 3);
     }
 }
@@ -1001,9 +1022,16 @@ function spawnZombie() {
     x = Math.max(20, Math.min(game.worldWidth - 20, x));
     y = Math.max(20, Math.min(game.worldHeight - 20, y));
 
-    // Determine if demon zombie
-    const isDemon = Math.random() < CONFIG.DEMON_ZOMBIE_CHANCE;
-    game.zombies.push(new Zombie(x, y, isDemon));
+    // Determine zombie type (normal, demon, or fast)
+    let zombieType = 'normal';
+    const rand = Math.random();
+    if (rand < CONFIG.DEMON_ZOMBIE_CHANCE) {
+        zombieType = 'demon';
+    } else if (rand < CONFIG.DEMON_ZOMBIE_CHANCE + CONFIG.FAST_ZOMBIE_CHANCE) {
+        zombieType = 'fast';
+    }
+    
+    game.zombies.push(new Zombie(x, y, zombieType));
     game.zombiesInWave++;
 }
 
