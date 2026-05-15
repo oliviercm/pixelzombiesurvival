@@ -34,7 +34,7 @@
             border: 4px solid #e94560;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
-            cursor: crosshair;
+            cursor: none;
         }
 
         /* HUD overlay - displays health, ammo, weapon info */
@@ -250,7 +250,8 @@ const CONFIG = {
     MAX_ZOMBIES: 50,
     DEMON_ZOMBIE_CHANCE: 0.2,
     AMMO_PICKUP_AMOUNT: 10,
-    HEALTH_PICKUP_AMOUNT: 25
+    HEALTH_PICKUP_AMOUNT: 25,
+    CURSOR_SIZE: 8,
 };
 
 // ============================================
@@ -486,10 +487,10 @@ class Player {
         this.x = Math.max(this.width, Math.min(game.worldWidth - this.width, this.x + dx));
         this.y = Math.max(this.height, Math.min(game.worldHeight - this.height, this.y + dy));
 
-        // Update facing direction based on mouse
+        // Update facing direction based on mouse (with offset to correct for size of cursor and crosshair placement)
         const screenX = this.x - game.camera.x;
         const screenY = this.y - game.camera.y;
-        this.facing = Math.atan2(game.mouseY - screenY, game.mouseX - screenX);
+        this.facing = Math.atan2(game.mouseY - screenY - (CONFIG.CURSOR_SIZE / 2), game.mouseX - screenX - (CONFIG.CURSOR_SIZE / 2));
 
         // Handle weapon switching
         if (keys['KeyQ']) {
@@ -1176,17 +1177,19 @@ function drawGame() {
         ctx.globalAlpha = 1;
     });
 
-    // Draw crosshair
+    // Draw crosshair - offset based on CURSOR_SIZE to center on actual cursor hotspot
+    const cx = game.mouseX - (CONFIG.CURSOR_SIZE / 2);
+    const cy = game.mouseY - (CONFIG.CURSOR_SIZE / 2);
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(game.mouseX, game.mouseY, 10, 0, Math.PI * 2);
+    ctx.arc(cx, cy, (CONFIG.CURSOR_SIZE * 1.5), 0, Math.PI * 2);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(game.mouseX - 15, game.mouseY);
-    ctx.lineTo(game.mouseX + 15, game.mouseY);
-    ctx.moveTo(game.mouseX, game.mouseY - 15);
-    ctx.lineTo(game.mouseX, game.mouseY + 15);
+    ctx.moveTo(cx - (CONFIG.CURSOR_SIZE * 2), cy);
+    ctx.lineTo(cx + (CONFIG.CURSOR_SIZE * 2), cy);
+    ctx.moveTo(cx, cy - (CONFIG.CURSOR_SIZE * 2));
+    ctx.lineTo(cx, cy + (CONFIG.CURSOR_SIZE * 2));
     ctx.stroke();
 }
 
