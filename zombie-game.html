@@ -708,10 +708,10 @@ class Player {
             const spreadAngle = (Math.random() - 0.5) * weapon.spread * 2;
             const angle = this.facing + spreadAngle;
 
-            // Create bullet
+            // Create bullet (origin at gun barrel tip)
             const bullet = {
-                x: this.x + Math.cos(this.facing) * 15,
-                y: this.y + Math.sin(this.facing) * 15,
+                x: this.x + Math.cos(this.facing) * 25,
+                y: this.y + Math.sin(this.facing) * 25,
                 vx: Math.cos(angle) * weapon.bulletSpeed,
                 vy: Math.sin(angle) * weapon.bulletSpeed,
                 damage: weapon.damage,
@@ -724,17 +724,17 @@ class Player {
 
             game.bullets.push(bullet);
 
-            // Create muzzle flash particle
-            for (let j = 0; j < 3; j++) {
+            // Create muzzle flash particle (at gun barrel tip)
+            for (let j = 0; j < 5; j++) {
                 game.particles.push({
                     x: bullet.x,
                     y: bullet.y,
-                    vx: Math.cos(angle) * (Math.random() * 3 + 1),
-                    vy: Math.sin(angle) * (Math.random() * 3 + 1),
-                    life: 100,
-                    maxLife: 100,
+                    vx: Math.cos(angle) * (Math.random() * 4 + 2),
+                    vy: Math.sin(angle) * (Math.random() * 4 + 2),
+                    life: 150,
+                    maxLife: 150,
                     color: '#ffff00',
-                    size: 2
+                    size: 4
                 });
             }
         }
