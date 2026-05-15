@@ -1,0 +1,13 @@
+# Opencode / AI agent files
+.opencode/
+.mindmodel/
+*.opencode.*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts (if any added later)
+*.min.js
+*.min.css
