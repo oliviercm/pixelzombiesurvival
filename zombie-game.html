@@ -560,9 +560,11 @@ document.addEventListener('keyup', (e) => {
 
 // Mouse tracking for aiming
 document.addEventListener('mousemove', (e) => {
-    const rect = game.canvas.getBoundingClientRect();
-    game.mouseX = e.clientX - rect.left;
-    game.mouseY = e.clientY - rect.top;
+    if (game.canvas) {
+        const rect = game.canvas.getBoundingClientRect();
+        game.mouseX = e.clientX - rect.left;
+        game.mouseY = e.clientY - rect.top;
+    }
 });
 
 // ============================================
