@@ -231,6 +231,7 @@
 const CONFIG = {
     CANVAS_WIDTH: 1200,
     CANVAS_HEIGHT: 800,
+    TARGET_FPS: 60,
     PLAYER_SPEED: 3,
     PLAYER_SIZE: 20,
     PLAYER_HEALTH: 100,
@@ -467,7 +468,10 @@ let game = {
     mouseClick: false,
     camera: { x: 0, y: 0 },
     worldWidth: 1800,
-    worldHeight: 1200
+    worldHeight: 1200,
+    lastFrameTime: 0,
+    deltaTime: 0,
+    time: 0
 };
 
 // ============================================
@@ -635,7 +639,8 @@ class Player {
     }
 
     update(deltaTime) {
-        // Movement with WASD
+        // Movement with WASD (speed is pixels per second)
+        const timeScale = deltaTime / 16.67;
         let dx = 0;
         let dy = 0;
 
@@ -649,6 +654,10 @@ class Player {
             dx *= 0.707;
             dy *= 0.707;
         }
+
+        // Apply movement scaled by deltaTime
+        dx *= timeScale;
+        dy *= timeScale;
 
         // Apply movement with world bounds
         this.x = Math.max(this.width, Math.min(game.worldWidth - this.width, this.x + dx));
@@ -821,14 +830,15 @@ class Zombie {
     }
 
     update(deltaTime) {
-        // Move toward player
+        // Move toward player (speed is pixels per second)
+        const timeScale = deltaTime / 16.67;
         const dx = game.player.x - this.x;
         const dy = game.player.y - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > 0) {
-            this.x += (dx / distance) * this.speed;
-            this.y += (dy / distance) * this.speed;
+            this.x += (dx / distance) * this.speed * timeScale;
+            this.y += (dy / distance) * this.speed * timeScale;
         }
 
         // Attack player if close enough
@@ -929,12 +939,14 @@ class Pickup {
         this.life = CONFIG.PICKUP_LIFETIME;
         this.maxLife = CONFIG.PICKUP_LIFETIME;
         this.bobOffset = Math.random() * Math.PI * 2;
+        this.bobTime = 0;
         // Randomly assign type: health or ammo
         this.type = Math.random() > 0.5 ? 'health' : 'ammo';
     }
 
     update(deltaTime) {
         this.life -= deltaTime;
+        this.bobTime += deltaTime;
         return this.life > 0;
     }
 
@@ -948,8 +960,8 @@ class Pickup {
             return;
         }
 
-        // Bobbing animation
-        const bob = Math.sin(Date.now() / 300 + this.bobOffset) * 3;
+        // Bobbing animation (framerate independent)
+        const bob = Math.sin(this.bobTime / 300 + this.bobOffset) * 3;
 
         // Fade out when expiring
         const alpha = Math.min(1, this.life / 3000);
@@ -1149,12 +1161,13 @@ function drawBackground() {
 /**
  * Update and draw bullets
  */
-function updateBullets() {
+function updateBullets(deltaTime) {
+    const timeScale = deltaTime / 16.67;
     for (let i = game.bullets.length - 1; i >= 0; i--) {
         const bullet = game.bullets[i];
-        bullet.x += bullet.vx;
-        bullet.y += bullet.vy;
-        bullet.life -= 16;
+        bullet.x += bullet.vx * timeScale;
+        bullet.y += bullet.vy * timeScale;
+        bullet.life -= deltaTime;
 
         // Remove expired bullets
         if (bullet.life <= 0) {
@@ -1206,7 +1219,8 @@ function createExplosion(x, y, radius, damage) {
         radius: 0,
         maxRadius: radius,
         life: 300,
-        damage: damage
+        damage: damage,
+        startTime: game.time
     });
 
     // Create explosion particles
@@ -1228,11 +1242,11 @@ function createExplosion(x, y, radius, damage) {
 /**
  * Update explosions
  */
-function updateExplosions() {
+function updateExplosions(deltaTime) {
     for (let i = game.explosions.length - 1; i >= 0; i--) {
         const explosion = game.explosions[i];
-        explosion.life -= 16;
-        explosion.radius = explosion.maxRadius * (1 - explosion.life / 300);
+        explosion.life -= deltaTime;
+        explosion.radius = explosion.maxRadius * Math.min(1, (300 - explosion.life) / 300);
 
         // Apply damage to nearby zombies
         if (explosion.radius > 0) {
@@ -1260,14 +1274,17 @@ function updateExplosions() {
 /**
  * Update particles
  */
-function updateParticles() {
+function updateParticles(deltaTime) {
+    const timeScale = deltaTime / 16.67;
     for (let i = game.particles.length - 1; i >= 0; i--) {
         const particle = game.particles[i];
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.vx *= 0.95;
-        particle.vy *= 0.95;
-        particle.life -= 16;
+        particle.x += particle.vx * timeScale;
+        particle.y += particle.vy * timeScale;
+        // Exponential decay based on deltaTime for framerate independence
+        const decayFactor = Math.pow(0.95, deltaTime / 16.67);
+        particle.vx *= decayFactor;
+        particle.vy *= decayFactor;
+        particle.life -= deltaTime;
 
         if (particle.life <= 0) {
             game.particles.splice(i, 1);
@@ -1278,10 +1295,10 @@ function updateParticles() {
 /**
  * Update pickups
  */
-function updatePickups() {
+function updatePickups(deltaTime) {
     for (let i = game.pickups.length - 1; i >= 0; i--) {
         const pickup = game.pickups[i];
-        const alive = pickup.update(16);
+        const alive = pickup.update(deltaTime);
 
         if (!alive) {
             game.pickups.splice(i, 1);
@@ -1410,13 +1427,28 @@ function drawGame() {
 /**
  * Main game loop
  */
-function gameLoop() {
+function gameLoop(timestamp) {
     if (!game.running) return;
+
+    if (game.lastFrameTime === 0) {
+        game.lastFrameTime = timestamp;
+    }
+
+    let deltaTime = timestamp - game.lastFrameTime;
+    game.lastFrameTime = timestamp;
+    game.deltaTime = deltaTime;
+    game.time += deltaTime;
+
+    // Cap deltaTime to prevent spiral of death on lag spikes
+    if (deltaTime > 100) {
+        deltaTime = 100;
+        game.time -= 100;
+    }
 
     const now = Date.now();
 
     // Update player
-    game.player.update(16);
+    game.player.update(deltaTime);
 
     // Update camera
     updateCamera();
@@ -1445,12 +1477,12 @@ function gameLoop() {
         game.lastPickupSpawn = now;
     }
 
-    // Update entities
-    game.zombies.forEach(zombie => zombie.update(16));
-    updateBullets();
-    updateExplosions();
-    updateParticles();
-    updatePickups();
+    // Update entities with deltaTime
+    game.zombies.forEach(zombie => zombie.update(deltaTime));
+    updateBullets(deltaTime);
+    updateExplosions(deltaTime);
+    updateParticles(deltaTime);
+    updatePickups(deltaTime);
 
     // Draw everything
     drawGame();
