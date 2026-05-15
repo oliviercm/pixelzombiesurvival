@@ -413,6 +413,7 @@ let game = {
     lastPickupSpawn: 0,
     mouseX: 0,
     mouseY: 0,
+    mouseClick: false,
     camera: { x: 0, y: 0 },
     worldWidth: 2400,
     worldHeight: 1600
@@ -500,8 +501,8 @@ class Player {
             this.weaponIndex = (this.weaponIndex + 1) % this.weapons.length;
         }
 
-        // Shooting
-        if (keys['Space']) {
+        // Shooting - respond to both spacebar and mouse click
+        if (keys['Space'] || game.mouseClick) {
             this.shoot();
         }
 
@@ -836,6 +837,22 @@ function initGame() {
     // Hide screens
     document.getElementById('instructionsScreen').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'none';
+
+    // Attach mouse event listeners for shooting (must be after canvas exists)
+    game.canvas.addEventListener('mousedown', (e) => {
+        if (game.running && e.button === 0) { // Left click only
+            game.mouseClick = true;
+        }
+    });
+
+    game.canvas.addEventListener('mouseup', (e) => {
+        if (e.button === 0) { // Left button only
+            game.mouseClick = false;
+        }
+    });
+
+    // Prevent context menu on right click
+    game.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
     // Start game loop
     requestAnimationFrame(gameLoop);
@@ -1247,17 +1264,6 @@ function restartGame() {
 // ============================================
 document.getElementById('startBtn').addEventListener('click', initGame);
 document.getElementById('restartBtn').addEventListener('click', restartGame);
-
-// Handle canvas click for shooting (alternative to spacebar)
-game.canvas.addEventListener('mousedown', (e) => {
-    if (game.running) {
-        keys['Space'] = true;
-        setTimeout(() => { keys['Space'] = false; }, 50);
-    }
-});
-
-// Prevent context menu on right click
-game.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 
 </body>
