@@ -214,7 +214,7 @@
         <p>Survive waves of zombies!</p>
         <p>Gray Zombies: 10 hits to kill you</p>
         <p>Red Demon Zombies: 4 hits to kill you</p>
-        <p>Pick up RED SQUARES for health & ammo!</p>
+        <p>Pick up GREEN CROSSES for health and YELLOW STRIPED boxes for ammo!</p>
         <br>
         <p>Each weapon has limited ammo. Manage wisely!</p>
     </div>
@@ -1196,18 +1196,48 @@ class Pickup {
         ctx.globalAlpha = alpha;
 
         if (this.type === 'health') {
-            // Draw health pickup (green cross)
-            ctx.fillStyle = '#00ff00';
-            ctx.fillRect(screenX - this.size/2, screenY - this.size/2 + bob, this.size, this.size);
+            // Draw health pickup - green square with white cross (plus sign)
+            const s = this.size;
+            const half = s / 2;
+            const crossThickness = 4;
+
+            // Green square background
+            ctx.fillStyle = '#00cc00';
+            ctx.fillRect(screenX - half, screenY - half + bob, s, s);
+
+            // White cross (plus sign) - vertical bar
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(screenX - 2, screenY - this.size/2 + 3 + bob, 4, this.size - 6);
-            ctx.fillRect(screenX - this.size/2 + 3, screenY - 2 + bob, this.size - 6, 4);
+            ctx.fillRect(screenX - crossThickness/2, screenY - half + 2 + bob, crossThickness, s - 4);
+
+            // White cross - horizontal bar
+            ctx.fillRect(screenX - half + 2, screenY - crossThickness/2 + bob, s - 4, crossThickness);
+
+            // Subtle border for definition
+            ctx.strokeStyle = '#006600';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(screenX - half, screenY - half + bob, s, s);
         } else {
-            // Draw ammo pickup (yellow box)
-            ctx.fillStyle = '#ffff00';
-            ctx.fillRect(screenX - this.size/2, screenY - this.size/2 + bob, this.size, this.size);
-            ctx.fillStyle = '#ffaa00';
-            ctx.fillRect(screenX - this.size/2 + 2, screenY - this.size/2 + 2 + bob, this.size - 4, this.size - 4);
+            // Draw ammo pickup - rectangle with yellow and orange vertical stripes (bullet look)
+            const s = this.size;
+            const half = s / 2;
+            const stripeWidth = 4;
+            const numStripes = Math.floor(s / stripeWidth);
+
+            // Darker background for contrast
+            ctx.fillStyle = '#cc8800';
+            ctx.fillRect(screenX - half, screenY - half + bob, s, s);
+
+            // Draw alternating yellow and orange vertical stripes
+            for (let i = 0; i < numStripes; i++) {
+                const stripeX = screenX - half + i * stripeWidth;
+                ctx.fillStyle = i % 2 === 0 ? '#ffff00' : '#ff8800';
+                ctx.fillRect(stripeX, screenY - half + bob, stripeWidth, s);
+            }
+
+            // Subtle border for definition
+            ctx.strokeStyle = '#aa6600';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(screenX - half, screenY - half + bob, s, s);
         }
 
         ctx.globalAlpha = 1;
