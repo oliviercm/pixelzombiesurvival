@@ -250,6 +250,10 @@ const CONFIG = {
     CURSOR_SIZE: 8,
     ZOMBIE_SPAWN_GROUP_MIN: 3,
     ZOMBIE_SPAWN_GROUP_MAX: 5,
+    BARRELS_PER_WAVE_MIN: 1,
+    BARRELS_PER_WAVE_MAX: 3,
+    BARREL_HEALTH_MIN: 30,
+    BARREL_HEALTH_MAX: 50,
 };
 
 // ============================================
@@ -490,6 +494,7 @@ let game = {
     pickups: [],
     particles: [],
     explosions: [],
+    barrels: [],
     kills: 0,
     wave: 1,
     zombiesInWave: 0,
@@ -1260,6 +1265,151 @@ class Pickup {
     }
 }
 
+/**
+ * Barrel class - explosive environmental hazard
+ * Stationary objects that explode when destroyed, damaging nearby zombies and players
+ */
+class Barrel {
+    constructor(x, y, health) {
+        this.x = x;
+        this.y = y;
+        this.width = 16;
+        this.height = 28;
+        this.health = health;
+        this.maxHealth = health;
+        this.isExploding = false;
+        this.explosionTimer = 0;
+        this.explosionRadius = 120;
+        this.explosionDamage = 25;
+    }
+
+    update(deltaTime) {
+        if (this.isExploding) {
+            this.explosionTimer -= deltaTime;
+            if (this.explosionTimer <= 0) {
+                return false; // Barrel destroyed
+            }
+        }
+        return true; // Barrel still exists
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+
+        // Create hit particles
+        for (let i = 0; i < 3; i++) {
+            game.particles.push({
+                x: this.x,
+                y: this.y,
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3,
+                life: 200,
+                maxLife: 200,
+                color: '#ffaa00',
+                size: 2
+            });
+        }
+
+        if (this.health <= 0 && !this.isExploding) {
+            this.isExploding = true;
+            this.explosionTimer = 300; // 300ms explosion animation
+
+            // Create explosion effect
+            createExplosion(this.x, this.y, this.explosionRadius, this.explosionDamage);
+            SoundEngine.playExplosion(this.explosionRadius);
+
+            // Create smoke particles
+            for (let i = 0; i < 15; i++) {
+                const angle = (Math.PI * 2 / 15) * i;
+                game.particles.push({
+                    x: this.x,
+                    y: this.y,
+                    vx: Math.cos(angle) * (Math.random() * 4 + 2),
+                    vy: Math.sin(angle) * (Math.random() * 4 + 2),
+                    life: 600,
+                    maxLife: 600,
+                    color: '#555555',
+                    size: Math.random() * 6 + 4
+                });
+            }
+        }
+    }
+
+    draw(ctx) {
+        const screenX = this.x - game.camera.x;
+        const screenY = this.y - game.camera.y;
+
+        // Skip if off screen
+        if (screenX < -35 || screenX > CONFIG.CANVAS_WIDTH + 35 ||
+            screenY < -35 || screenY > CONFIG.CANVAS_HEIGHT + 35) {
+            return;
+        }
+
+        // Draw explosion flash
+        if (this.isExploding) {
+            const flashAlpha = this.explosionTimer / 300;
+            ctx.globalAlpha = flashAlpha;
+            ctx.fillStyle = '#ff6600';
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw barrel body (dark red)
+        const healthPercent = this.health / this.maxHealth;
+        const barrelColor = healthPercent > 0.5 ? '#8B0000' : '#6B0000';
+        ctx.fillStyle = barrelColor;
+        ctx.fillRect(screenX - this.width / 2, screenY - this.height / 2, this.width, this.height);
+
+        // Draw barrel top (slightly lighter)
+        ctx.fillStyle = '#A00000';
+        ctx.fillRect(screenX - this.width / 2 + 2, screenY - this.height / 2 + 2, this.width - 4, this.height / 3);
+
+        // Draw rope detail (two horizontal lines)
+        ctx.strokeStyle = '#4A0000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(screenX - this.width / 2 + 2, screenY - 2);
+        ctx.lineTo(screenX + this.width / 2 - 2, screenY - 2);
+        ctx.moveTo(screenX - this.width / 2 + 2, screenY + 4);
+        ctx.lineTo(screenX + this.width / 2 - 2, screenY + 4);
+        ctx.stroke();
+
+        // Draw border
+        ctx.strokeStyle = '#3D0000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(screenX - this.width / 2, screenY - this.height / 2, this.width, this.height);
+
+        // Draw health bar if damaged
+        if (healthPercent < 1) {
+            const healthBarWidth = 24;
+            ctx.fillStyle = '#333333';
+            ctx.fillRect(screenX - healthBarWidth / 2, screenY - this.height / 2 - 8, healthBarWidth, 3);
+            ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
+            ctx.fillRect(screenX - healthBarWidth / 2, screenY - this.height / 2 - 8, healthBarWidth * healthPercent, 3);
+        }
+    }
+}
+
+/**
+ * Spawn explosive barrels at random positions in the arena
+ * Called at the start of each wave
+ */
+function spawnBarrels() {
+    const count = Math.floor(Math.random() * (CONFIG.BARRELS_PER_WAVE_MAX - CONFIG.BARRELS_PER_WAVE_MIN + 1)) + CONFIG.BARRELS_PER_WAVE_MIN;
+    const minHealth = CONFIG.BARREL_HEALTH_MIN;
+    const maxHealth = CONFIG.BARREL_HEALTH_MAX;
+
+    for (let i = 0; i < count; i++) {
+        // Random position within arena (50px margin from edges)
+        const x = Math.random() * (game.worldWidth - 100) + 50;
+        const y = Math.random() * (game.worldHeight - 100) + 50;
+        const health = Math.floor(Math.random() * (maxHealth - minHealth + 1)) + minHealth;
+        game.barrels.push(new Barrel(x, y, health));
+    }
+}
+
 // ============================================
 // GAME FUNCTIONS
 // ============================================
@@ -1283,6 +1433,8 @@ function initGame() {
     game.pickups = [];
     game.particles = [];
     game.explosions = [];
+    game.barrels = [];
+    spawnBarrels();
     game.kills = 0;
     game.wave = 1;
     game.zombiesInWave = 0;
@@ -1467,6 +1619,29 @@ function updateBullets(deltaTime) {
         // Remove bullet if it hit something
         if (hit) {
             game.bullets.splice(i, 1);
+            continue;
+        }
+
+        // Check if bullet hit barrel
+        let barrelHit = false;
+        if (game.barrels) {
+            for (const barrel of game.barrels) {
+                if (barrel.isExploding) continue;
+                const dx = bullet.x - barrel.x;
+                const dy = bullet.y - barrel.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < bullet.size + Math.max(barrel.width, barrel.height) / 2) {
+                    barrelHit = true;
+                    barrel.takeDamage(bullet.damage);
+                    SoundEngine.playHit(bullet.weaponType);
+                    break;
+                }
+            }
+        }
+
+        if (barrelHit) {
+            game.bullets.splice(i, 1);
         }
     }
 }
@@ -1606,6 +1781,20 @@ function updateExplosions(deltaTime) {
             }
         }
 
+        // Explosions damage barrels (chain reactions)
+        if (explosion.radius > 0 && game.barrels) {
+            for (const barrel of game.barrels) {
+                if (barrel.isExploding) continue;
+                const dx = explosion.x - barrel.x;
+                const dy = explosion.y - barrel.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < explosion.radius + Math.max(barrel.width, barrel.height) / 2) {
+                    barrel.takeDamage(explosion.damage);
+                }
+            }
+        }
+
         if (explosion.life <= 0) {
             game.explosions.splice(i, 1);
         }
@@ -1741,6 +1930,11 @@ function drawGame() {
     // Draw pickups
     game.pickups.forEach(pickup => pickup.draw(ctx));
 
+    // Draw barrels
+    if (game.barrels) {
+        game.barrels.forEach(barrel => barrel.draw(ctx));
+    }
+
     // Draw zombies
     game.zombies.forEach(zombie => zombie.draw(ctx));
 
@@ -1855,6 +2049,7 @@ function gameLoop(timestamp) {
         game.wave++;
         game.zombiesToSpawn = CONFIG.ZOMBIES_PER_WAVE + (game.wave - 1) * 2;
         CONFIG.ZOMBIE_SPAWN_INTERVAL = Math.max(1000, 3000 - game.wave * 100);
+        spawnBarrels();
     }
 
     // Spawn pickups
@@ -1869,6 +2064,15 @@ function gameLoop(timestamp) {
     updateExplosions(deltaTime);
     updateParticles(deltaTime);
     updatePickups(deltaTime);
+
+    // Update barrels
+    if (game.barrels) {
+        for (let i = game.barrels.length - 1; i >= 0; i--) {
+            if (!game.barrels[i].update(deltaTime)) {
+                game.barrels.splice(i, 1);
+            }
+        }
+    }
 
     // Draw everything
     drawGame();
