@@ -271,7 +271,7 @@ const ZombieTypes = {
             hitParticle: '#888888',
             deathParticle: '#666666'
         },
-        spawnChance: 0.65
+        spawnChance: 0.50
     },
     demon: {
         name: 'Demon Zombie',
@@ -300,6 +300,22 @@ const ZombieTypes = {
             healthBar: '#ffff00',
             hitParticle: '#ffff00',
             deathParticle: '#ffdd00'
+        },
+        spawnChance: 0.15
+    },
+    boomer: {
+        name: 'Boomer Zombie',
+        speed: 1,
+        health: 50,
+        damage: 15,
+        size: 1.4,
+        colors: {
+            body: '#44aa44',
+            head: '#338833',
+            eyes: '#ff0000',
+            healthBar: '#44aa44',
+            hitParticle: '#44aa44',
+            deathParticle: '#66cc66'
         },
         spawnChance: 0.15
     }
@@ -1001,12 +1017,19 @@ class Zombie {
     constructor(x, y, type = 'normal') {
         this.x = x;
         this.y = y;
-        this.width = CONFIG.ZOMBIE_SIZE;
-        this.height = CONFIG.ZOMBIE_SIZE;
         this.type = type;
         
         // Get zombie type configuration
         const zombieConfig = ZombieTypes[type] || ZombieTypes.normal;
+        
+        // Apply size from configuration (boomer is larger)
+        if (zombieConfig.size) {
+            this.width = CONFIG.ZOMBIE_SIZE * zombieConfig.size;
+            this.height = CONFIG.ZOMBIE_SIZE * zombieConfig.size;
+        } else {
+            this.width = CONFIG.ZOMBIE_SIZE;
+            this.height = CONFIG.ZOMBIE_SIZE;
+        }
         
         // Apply stats from configuration
         this.speed = zombieConfig.speed;
@@ -1083,6 +1106,11 @@ class Zombie {
             
             // Create blood splatter on the ground (stationary, long-lasting)
             createBloodSplatter(this.x, this.y, 20);
+            
+            // Boomer explodes on death - damages nearby zombies and player
+            if (this.type === 'boomer') {
+                createBoomerExplosion(this.x, this.y);
+            }
             
             // Play zombie death sound
             SoundEngine.playZombieDeath();
@@ -1468,13 +1496,51 @@ function createBloodSplatter(x, y, count = 20) {
 }
 
 /**
+ * Create boomer explosion effect - damages both player and nearby zombies
+ */
+function createBoomerExplosion(x, y) {
+    const explosionRadius = 100;
+    const explosionDamage = 15;
+    
+    // Create explosion visual effect (green themed)
+    game.explosions.push({
+        x: x,
+        y: y,
+        radius: 0,
+        maxRadius: explosionRadius,
+        life: 400,
+        damage: explosionDamage,
+        startTime: game.time,
+        isBoomer: true
+    });
+
+    // Create green explosion particles
+    for (let i = 0; i < 30; i++) {
+        const angle = (Math.PI * 2 / 30) * i;
+        game.particles.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * (Math.random() * 6 + 3),
+            vy: Math.sin(angle) * (Math.random() * 6 + 3),
+            life: 500,
+            maxLife: 500,
+            color: Math.random() > 0.5 ? '#44ff44' : '#88ff00',
+            size: Math.random() * 5 + 3
+        });
+    }
+    
+    // Play explosion sound
+    SoundEngine.playExplosion(explosionRadius);
+}
+
+/**
  * Update explosions
  */
 function updateExplosions(deltaTime) {
     for (let i = game.explosions.length - 1; i >= 0; i--) {
         const explosion = game.explosions[i];
         explosion.life -= deltaTime;
-        explosion.radius = explosion.maxRadius * Math.min(1, (300 - explosion.life) / 300);
+        explosion.radius = Math.max(0, explosion.maxRadius * Math.min(1, (300 - explosion.life) / 300));
 
         // Play explosion sound once when it starts (avoid repeated sounds)
         if (explosion.radius > 0 && !explosion.soundPlayed) {
@@ -1496,6 +1562,17 @@ function updateExplosions(deltaTime) {
                         game.zombies.splice(j, 1);
                     }
                 }
+            }
+        }
+
+        // Boomer explosions also damage the player
+        if (explosion.isBoomer && explosion.radius > 0) {
+            const dx = explosion.x - game.player.x;
+            const dy = explosion.y - game.player.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < explosion.radius + 10) {
+                game.player.takeDamage(explosion.damage);
             }
         }
 

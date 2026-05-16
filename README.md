@@ -5,7 +5,7 @@ A single-file HTML5 canvas zombie survival game. Survive waves of zombies using 
 ## Features
 
 - **10 Weapons**: From Glock pistol to RPG launcher, each with unique stats
-- **3 Zombie Types**: Normal (gray), Demon (red, fast), Fast (yellow, swift)
+- **4 Zombie Types**: Normal (gray), Demon (red, fast), Fast (yellow, swift), Boomer (green, explodes on death)
 - **Wave System**: Escalating difficulty with more zombies per wave
 - **Pickup System**: Health (green) and ammo (yellow) powerups
 - **Particle Effects**: Blood splatter, muzzle flash, explosions

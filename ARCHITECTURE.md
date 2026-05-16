@@ -18,7 +18,7 @@ A single-file HTML5 canvas zombie survival game. The player navigates a 1800×12
 
 ```
 zomb/
-├── zombie-game.html    # Everything: HTML + CSS + JS (1,596 lines)
+├── zombie-game.html    # Everything: HTML + CSS + JS (1,880 lines)
 ├── ARCHITECTURE.md     # This file
 ├── CODE_STYLE.md       # Coding conventions
 ├── README.md           # Project overview
@@ -42,8 +42,8 @@ The file is organized into **13 logical sections** using comment headers:
 │ 3. GAME CONFIGURATION                           │  (Lines 231-253)
 │    - Constants: sizes, speeds, intervals        │
 ├─────────────────────────────────────────────────┤
-│ 4. ZOMBIE TYPE DEFINITIONS                      │  (Lines 259-306)
-│    - Data-driven: normal, demon, fast           │
+│ 4. ZOMBIE TYPE DEFINITIONS                      │  (Lines 259-323)
+│    - Data-driven: normal, demon, fast, boomer    │
 ├─────────────────────────────────────────────────┤
 │ 5. WEAPON DEFINITIONS                           │  (Lines 311-444)
 │    - Array of 10 weapons with stats             │
@@ -57,12 +57,12 @@ The file is organized into **13 logical sections** using comment headers:
 │ 8. INPUT HANDLING                               │  (Lines 595-617)
 │    - Keyboard + mouse event listeners           │
 ├─────────────────────────────────────────────────┤
-│ 9. ENTITY CLASSES                               │  (Lines 622-1005)
+│ 9. ENTITY CLASSES                               │  (Lines 834-1162)
 │    - Player class (movement, shooting, health)  │
 │    - Zombie class (AI, damage, rendering)       │
 │    - Pickup class (health/ammo powerups)        │
 ├─────────────────────────────────────────────────┤
-│ 10. GAME FUNCTIONS                              │  (Lines 1009-1593)
+│ 10. GAME FUNCTIONS                              │  (Lines 1241-1857)
 │     - initGame(), spawnZombie(), spawnPickup()  │
 │     - updateBullets(), updateParticles()        │
 │     - drawBackground(), drawGame()              │
@@ -103,8 +103,8 @@ Player.update() ──▶ Player.shoot() ──▶ SoundEngine.playShoot()
     ▼
 Update Physics ──▶ Bullet-Zombie collision ──▶ Zombie.takeDamage()
     │                       │
-    │                       ▼
-    │                  Zombie death? ──▶ createBloodSplatter()
+   │                       ▼
+     │                  Zombie death? ──▶ createBloodSplatter() + createBoomerExplosion() (if boomer)
     │                       │
     │                       ▼
     │                  game.kills++
@@ -135,6 +135,7 @@ SPAWN ──▶ UPDATE ──▶ RENDER
 - **Data-driven types**: `ZombieTypes` object defines stats; `Zombie` class reads them
 - **Spawning**: Groups of 3-5 zombies at arena edges
 - **AI**: Simple seek behavior toward player position
+- **Explosions**: Boomer zombies detonate on death, damaging nearby zombies AND the player
 
 ### Weapon System
 - **10 weapons** defined as data objects
