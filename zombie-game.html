@@ -513,10 +513,7 @@ let game = {
 };
 
 // ============================================
-// SOUND ENGINE - Web Audio API Layered Sounds
-// ============================================
-// Each sound is composed of multiple layers for depth and character.
-// A "punchy" sound needs: transient attack + low-frequency body + texture
+// SOUND ENGINE - Web Audio API
 // ============================================
 const SoundEngine = {
     audioContext: null,
@@ -573,97 +570,11 @@ const SoundEngine = {
         }
     },
 
-    // Decode a WAV blob into an AudioBuffer (for future use)
-    async decodeWav(blob) {
-        const arrayBuffer = await blob.arrayBuffer();
-        return this.audioContext.decodeAudioData(arrayBuffer);
-    },
-
     // Resume AudioContext if suspended (browser policy)
     resume() {
         if (this.audioContext && this.audioContext.state === 'suspended') {
             this.audioContext.resume();
         }
-    },
-
-    // ============================================
-    // LAYERED SOUND UTILITIES
-    // ============================================
-
-    // Play a layered noise sound - multiple overlapping noise elements
-    // layers: array of {duration, frequency, volume, decay, type?, filterType?}
-    playLayeredNoise(layers) {
-        if (!this.audioContext) return;
-        this.resume();
-
-        layers.forEach(layer => {
-            const duration = layer.duration;
-            const bufferSize = this.audioContext.sampleRate * duration;
-            const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
-            const data = buffer.getChannelData(0);
-
-            const decay = layer.decay || 0.05;
-
-            // Generate noise with optional variation
-            for (let i = 0; i < bufferSize; i++) {
-                const envelope = Math.exp(-i / (bufferSize * decay));
-                // Add some texture variation based on layer type
-                let texture = 1;
-                if (layer.type === 'crackle') {
-                    texture = Math.random() > 0.7 ? 1.5 : 0.3;
-                } else if (layer.type === 'rumble') {
-                    texture = 0.8 + Math.sin(i / 100) * 0.2;
-                }
-                data[i] = (Math.random() * 2 - 1) * envelope * texture;
-            }
-
-            const source = this.audioContext.createBufferSource();
-            source.buffer = buffer;
-
-            // Filter to shape the sound
-            const filter = this.audioContext.createBiquadFilter();
-            filter.type = layer.filterType || 'lowpass';
-            filter.frequency.value = layer.frequency;
-
-            // Volume control
-            const gainNode = this.audioContext.createGain();
-            gainNode.gain.value = layer.volume;
-
-            source.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-
-            source.start();
-            source.stop(this.audioContext.currentTime + duration);
-        });
-    },
-
-    // Play layered tones - multiple overlapping oscillators
-    // layers: array of {frequency, duration, volume, type?, frequencyRamp?}
-    playLayeredTone(layers) {
-        if (!this.audioContext) return;
-        this.resume();
-
-        layers.forEach(layer => {
-            const oscillator = this.audioContext.createOscillator();
-            oscillator.type = layer.type || 'sine';
-            oscillator.frequency.setValueAtTime(layer.frequency, this.audioContext.currentTime);
-
-            // Optional frequency ramp for movement
-            if (layer.frequencyRamp) {
-                oscillator.frequency.exponentialRampToValueAtTime(layer.frequencyRamp, this.audioContext.currentTime + layer.duration);
-            }
-
-            const gainNode = this.audioContext.createGain();
-            gainNode.gain.setValueAtTime(layer.volume, this.audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + layer.duration);
-
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-
-            oscillator.start();
-            oscillator.stop(this.audioContext.currentTime + layer.duration);
-        });
     },
 
     // ============================================
@@ -691,7 +602,7 @@ const SoundEngine = {
     playShoot(weaponType = 'rifle') {
         const buffer = this.sounds[weaponType];
         if (buffer) {
-            this.playBuffer(buffer, 1.0);
+            this.playBuffer(buffer, 0.4);
         } else {
             // Fallback to synthesized sound if WAV not loaded
             console.warn(`No sound loaded for weapon type: ${weaponType}`);
