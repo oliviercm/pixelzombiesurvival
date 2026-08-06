@@ -237,7 +237,7 @@ const CONFIG = {
     PLAYER_HEALTH: 100,
     ZOMBIE_SIZE: 20,
     PICKUP_SIZE: 12,
-    PICKUP_SPAWN_INTERVAL: 8000,
+    PICKUP_SPAWN_INTERVAL: 4000,
     PICKUP_LIFETIME: 15000,
     MAX_PICKUPS: 5,
     INITIAL_ZOMBIE_COUNT: 5,
@@ -245,8 +245,8 @@ const CONFIG = {
     WAVE_DURATION: 60000,
     ZOMBIES_PER_WAVE: 10,
     MAX_ZOMBIES: 50,
-    AMMO_PICKUP_AMOUNT: 10,
-    HEALTH_PICKUP_AMOUNT: 25,
+    AMMO_PICKUP_PERCENT: 10,
+    HEALTH_PICKUP_PERCENT: 20,
     CURSOR_SIZE: 8,
     ZOMBIE_SPAWN_GROUP_MIN: 3,
     ZOMBIE_SPAWN_GROUP_MAX: 5,
@@ -846,10 +846,10 @@ class Player {
     }
 
     takeDamage(amount) {
-        if (this.invincibleTimer > 0) return;
+        if (this.invincibleTimer > 0) return false;
 
         this.health -= amount;
-        this.invincibleTimer = 500; // Half second invincibility
+        this.invincibleTimer = 200; // Brief invincibility window
 
         // Play damage sound
         SoundEngine.playDamage();
@@ -872,6 +872,7 @@ class Player {
             SoundEngine.playPlayerDeath();
             gameOver();
         }
+        return true;
     }
 
     draw(ctx) {
@@ -958,8 +959,9 @@ class Zombie {
         if (distance < 25) {
             const now = Date.now();
             if (now - this.lastAttack > this.attackCooldown) {
-                game.player.takeDamage(this.damage);
-                this.lastAttack = now;
+                if (game.player.takeDamage(this.damage)) {
+                    this.lastAttack = now;
+                }
             }
         }
 
@@ -1066,7 +1068,7 @@ class Pickup {
         this.bobOffset = Math.random() * Math.PI * 2;
         this.bobTime = 0;
         // Randomly assign type: health or ammo
-        this.type = Math.random() > 0.5 ? 'health' : 'ammo';
+        this.type = Math.random() > 0.7 ? 'health' : 'ammo';
     }
 
     update(deltaTime) {
@@ -1146,12 +1148,12 @@ class Pickup {
         SoundEngine.playPickup(this.type);
 
         if (this.type === 'health') {
-            player.health = Math.min(player.maxHealth, player.health + CONFIG.HEALTH_PICKUP_AMOUNT);
+            player.health = Math.min(player.maxHealth, player.health + Math.floor(player.maxHealth * CONFIG.HEALTH_PICKUP_PERCENT / 100));
             return true;
         } else {
             // Add ammo to all weapons
             player.weapons.forEach(w => {
-                w.currentAmmo = Math.min(w.maxAmmo, w.currentAmmo + CONFIG.AMMO_PICKUP_AMOUNT);
+                w.currentAmmo = Math.min(w.maxAmmo, w.currentAmmo + Math.floor(w.maxAmmo * CONFIG.AMMO_PICKUP_PERCENT / 100));
             });
             return true;
         }

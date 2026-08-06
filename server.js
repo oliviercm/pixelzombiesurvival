@@ -33,7 +33,7 @@ function serveFile(filePath, res) {
         }
         res.writeHead(200, {
             'Content-Type': contentType,
-            'Cache-Control': 'no-cache',
+            'Cache-Control': 'no-store',
         });
         res.end(data);
     });
