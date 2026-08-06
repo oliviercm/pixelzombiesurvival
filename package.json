@@ -1,0 +1,11 @@
+{
+  "name": "pixel-zombie-survival",
+  "version": "1.0.0",
+  "description": "Pixel Zombie Survival Game",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["game", "zombie", "pixel"],
+  "license": "MIT"
+}
