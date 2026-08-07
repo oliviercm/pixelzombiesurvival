@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { watch } = require('fs');
 const net = require('net');
+const { exec } = require('child_process');
 
 const PORT = 8081;
 const ROOT = __dirname;
@@ -83,6 +84,16 @@ async function startServer() {
         console.log(`\n  🎮 Pixel Zombie Survival`);
         console.log(`  🌐 Server running at http://localhost:${PORT}`);
         console.log(`  🔥 Hot-reload enabled\n`);
+
+        const url = `http://localhost:${PORT}`;
+        const platform = process.platform;
+        if (platform === 'win32') {
+            exec(`start ${url}`);
+        } else if (platform === 'darwin') {
+            exec(`open ${url}`);
+        } else {
+            exec(`xdg-open ${url}`);
+        }
     });
 }
 
