@@ -246,7 +246,7 @@ const CONFIG = {
     ZOMBIES_PER_WAVE: 20,
     MAX_ZOMBIES: 100,
     AMMO_PICKUP_PERCENT: 10,
-    HEALTH_PICKUP_PERCENT: 20,
+    HEALTH_PICKUP_PERCENT: 15,
     CURSOR_SIZE: 8,
     ZOMBIE_SPAWN_GROUP_MIN: 3,
     ZOMBIE_SPAWN_GROUP_MAX: 5,
@@ -264,7 +264,7 @@ const CONFIG = {
 const ZombieTypes = {
     normal: {
         name: 'Normal Zombie',
-        speed: 1,
+        speed: 2,
         health: 40,
         damage: 10,
         colors: {
@@ -279,7 +279,7 @@ const ZombieTypes = {
     },
     demon: {
         name: 'Demon Zombie',
-        speed: 1.2,
+        speed: 2.5,
         health: 60,
         damage: 25,
         colors: {
@@ -294,7 +294,7 @@ const ZombieTypes = {
     },
     fast: {
         name: 'Fast Zombie',
-        speed: 2.5,
+        speed: 3,
         health: 30,
         damage: 10,
         colors: {
@@ -309,7 +309,7 @@ const ZombieTypes = {
     },
     boomer: {
         name: 'Boomer Zombie',
-        speed: 1,
+        speed: 1.5,
         health: 50,
         damage: 15,
         size: 1.4,
@@ -445,7 +445,7 @@ const WEAPONS = [
         spread: 0.02,
         color: "#ff00ff",
         bulletSize: 8,
-        explosionRadius: 80,
+        explosionRadius: 120,
         description: "Heavy anti-armor weapon"
     },
     {
@@ -953,6 +953,15 @@ class Zombie {
         if (distance > 0) {
             this.x += (dx / distance) * this.speed * timeScale;
             this.y += (dy / distance) * this.speed * timeScale;
+        }
+
+        // Prevent clipping into the player
+        const minDist = (game.player.width + this.width) / 2;
+        if (distance < minDist && distance > 0) {
+            const nx = dx / distance;
+            const ny = dy / distance;
+            this.x = game.player.x - nx * minDist;
+            this.y = game.player.y - ny * minDist;
         }
 
         // Attack player if close enough
