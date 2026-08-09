@@ -385,7 +385,7 @@ const WEAPONS = [
         name: "Barrett M82A1 Sniper",
         ammo: 50,
         maxAmmo: 50,
-        fireRate: 1200,
+        fireRate: 1000,
         bulletSpeed: 25,
         damage: 100,
         bulletCount: 1,
@@ -395,28 +395,28 @@ const WEAPONS = [
         description: "Long-range precision"
     },
     {
-        name: "RPG Grenade Launcher",
+        name: "M79 Grenade Launcher",
         ammo: 30,
         maxAmmo: 30,
-        fireRate: 1500,
+        fireRate: 1200,
         bulletSpeed: 8,
         damage: 80,
         bulletCount: 1,
         spread: 0.03,
         color: "#888800",
         bulletSize: 6,
-        explosionRadius: 60,
+        explosionRadius: 75,
         description: "Explosive ordnance"
     },
     {
         name: "Mossberg 500 Shotgun",
         ammo: 60,
         maxAmmo: 60,
-        fireRate: 700,
+        fireRate: 800,
         bulletSpeed: 10,
         damage: 15,
         bulletCount: 10,
-        spread: 0.18,
+        spread: 0.20,
         color: "#cc6600",
         bulletSize: 2,
         description: "Pump-action power"
@@ -438,14 +438,14 @@ const WEAPONS = [
         name: "M72 LAW Rocket Launcher",
         ammo: 10,
         maxAmmo: 10,
-        fireRate: 2000,
+        fireRate: 2400,
         bulletSpeed: 7,
         damage: 150,
         bulletCount: 1,
         spread: 0.02,
         color: "#ff00ff",
         bulletSize: 8,
-        explosionRadius: 120,
+        explosionRadius: 140,
         description: "Heavy anti-armor weapon"
     },
     {
@@ -473,7 +473,7 @@ function getWeaponType(weapon) {
     if (name.includes('mp5') || name.includes('smg')) return 'smg';
     if (name.includes('shotgun')) return 'shotgun';
     if (name.includes('sniper')) return 'sniper';
-    if (name.includes('rpg')) return 'rpg';
+    if (name.includes('m79')) return 'm79';
     if (name.includes('law') || name.includes('rocket')) return 'law';
     if (name.includes('m249') || name.includes('light')) return 'lightmg';
     if (name.includes('gau') || name.includes('heavy')) return 'heavymg';
@@ -540,7 +540,7 @@ const SoundEngine = {
             smg: 'sounds/mp5-fire.wav',
             shotgun: 'sounds/r870-fire.wav',
             sniper: 'sounds/barretm82-fire.wav',
-            rpg: 'sounds/rpg-fire.wav',
+            m79: 'sounds/rpg-fire.wav',
             law: 'sounds/law.wav',
             lightmg: 'sounds/m249-fire.wav',
             heavymg: 'sounds/gau17-fire.wav',
