@@ -1260,38 +1260,40 @@ class Barrel {
             ctx.globalAlpha = 1;
         }
 
-        // Draw barrel body (dark red)
-        const healthPercent = this.health / this.maxHealth;
-        const barrelColor = healthPercent > 0.5 ? '#8B0000' : '#6B0000';
-        ctx.fillStyle = barrelColor;
-        ctx.fillRect(screenX - this.width / 2, screenY - this.height / 2, this.width, this.height);
+        if (!this.isExploding) {
+            // Draw barrel body (dark red)
+            const healthPercent = this.health / this.maxHealth;
+            const barrelColor = healthPercent > 0.5 ? '#8B0000' : '#6B0000';
+            ctx.fillStyle = barrelColor;
+            ctx.fillRect(screenX - this.width / 2, screenY - this.height / 2, this.width, this.height);
 
-        // Draw barrel top (slightly lighter)
-        ctx.fillStyle = '#A00000';
-        ctx.fillRect(screenX - this.width / 2 + 2, screenY - this.height / 2 + 2, this.width - 4, this.height / 3);
+            // Draw barrel top (slightly lighter)
+            ctx.fillStyle = '#A00000';
+            ctx.fillRect(screenX - this.width / 2 + 2, screenY - this.height / 2 + 2, this.width - 4, this.height / 3);
 
-        // Draw rope detail (two horizontal lines)
-        ctx.strokeStyle = '#4A0000';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(screenX - this.width / 2 + 2, screenY - 2);
-        ctx.lineTo(screenX + this.width / 2 - 2, screenY - 2);
-        ctx.moveTo(screenX - this.width / 2 + 2, screenY + 4);
-        ctx.lineTo(screenX + this.width / 2 - 2, screenY + 4);
-        ctx.stroke();
+            // Draw rope detail (two horizontal lines)
+            ctx.strokeStyle = '#4A0000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(screenX - this.width / 2 + 2, screenY - 2);
+            ctx.lineTo(screenX + this.width / 2 - 2, screenY - 2);
+            ctx.moveTo(screenX - this.width / 2 + 2, screenY + 4);
+            ctx.lineTo(screenX + this.width / 2 - 2, screenY + 4);
+            ctx.stroke();
 
-        // Draw border
-        ctx.strokeStyle = '#3D0000';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(screenX - this.width / 2, screenY - this.height / 2, this.width, this.height);
+            // Draw border
+            ctx.strokeStyle = '#3D0000';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(screenX - this.width / 2, screenY - this.height / 2, this.width, this.height);
 
-        // Draw health bar if damaged
-        if (healthPercent < 1) {
-            const healthBarWidth = 24;
-            ctx.fillStyle = '#333333';
-            ctx.fillRect(screenX - healthBarWidth / 2, screenY - this.height / 2 - 8, healthBarWidth, 3);
-            ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
-            ctx.fillRect(screenX - healthBarWidth / 2, screenY - this.height / 2 - 8, healthBarWidth * healthPercent, 3);
+            // Draw health bar if damaged
+            if (healthPercent < 1) {
+                const healthBarWidth = 24;
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(screenX - healthBarWidth / 2, screenY - this.height / 2 - 8, healthBarWidth, 3);
+                ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
+                ctx.fillRect(screenX - healthBarWidth / 2, screenY - this.height / 2 - 8, healthBarWidth * healthPercent, 3);
+            }
         }
     }
 }
@@ -1560,6 +1562,7 @@ function createExplosion(x, y, radius, damage) {
         radius: 0,
         maxRadius: radius,
         life: 300,
+        maxLife: 300,
         damage: damage,
         startTime: game.time
     });
@@ -1618,6 +1621,7 @@ function createBoomerExplosion(x, y) {
         radius: 0,
         maxRadius: explosionRadius,
         life: 400,
+        maxLife: 400,
         damage: explosionDamage,
         startTime: game.time,
         isBoomer: true,
@@ -1650,7 +1654,9 @@ function updateExplosions(deltaTime) {
     for (let i = game.explosions.length - 1; i >= 0; i--) {
         const explosion = game.explosions[i];
         explosion.life -= deltaTime;
-        explosion.radius = Math.max(0, explosion.maxRadius * Math.min(1, (300 - explosion.life) / 300));
+        const lifeRatio = explosion.life / explosion.maxLife;
+        explosion.radius = explosion.maxRadius * (1 - lifeRatio);
+        explosion.fadeAlpha = lifeRatio;
 
         // Play explosion sound once when it starts (avoid repeated sounds)
         if (explosion.radius > 0 && !explosion.soundPlayed) {
@@ -1869,16 +1875,19 @@ function drawGame() {
         const screenY = explosion.y - game.camera.y;
 
         const isBoomer = explosion.isBoomer;
-        ctx.fillStyle = isBoomer ? '#44ff4488' : '#ff660088';
+        const alpha = Math.max(0, explosion.fadeAlpha);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = isBoomer ? '#44ff44' : '#ff6600';
         ctx.beginPath();
         ctx.arc(screenX, screenY, explosion.radius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = isBoomer ? '#88ff0044' : '#ffff0044';
+        ctx.fillStyle = isBoomer ? '#88ff00' : '#ffff00';
         ctx.beginPath();
         ctx.arc(screenX, screenY, explosion.radius * 0.7, 0, Math.PI * 2);
         ctx.fill();
     });
+    ctx.globalAlpha = 1;
 
     // Draw regular particles (on top of everything)
     game.particles.forEach(particle => {
