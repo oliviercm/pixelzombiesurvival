@@ -1620,7 +1620,8 @@ function createBoomerExplosion(x, y) {
         life: 400,
         damage: explosionDamage,
         startTime: game.time,
-        isBoomer: true
+        isBoomer: true,
+        color: '#44ff44'
     });
 
     // Create green explosion particles
@@ -1867,12 +1868,13 @@ function drawGame() {
         const screenX = explosion.x - game.camera.x;
         const screenY = explosion.y - game.camera.y;
 
-        ctx.fillStyle = '#ff660088';
+        const isBoomer = explosion.isBoomer;
+        ctx.fillStyle = isBoomer ? '#44ff4488' : '#ff660088';
         ctx.beginPath();
         ctx.arc(screenX, screenY, explosion.radius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#ffff0044';
+        ctx.fillStyle = isBoomer ? '#88ff0044' : '#ffff0044';
         ctx.beginPath();
         ctx.arc(screenX, screenY, explosion.radius * 0.7, 0, Math.PI * 2);
         ctx.fill();
