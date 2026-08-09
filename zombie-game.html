@@ -162,6 +162,15 @@
             pointer-events: none;
             z-index: 10;
         }
+        .weapon-list-item {
+            font-size: 12px;
+            padding: 1px 0;
+            opacity: 0.6;
+        }
+        .weapon-list-item.active {
+            opacity: 1;
+            font-weight: bold;
+        }
 
         /* Kill counter */
         #killCounter {
@@ -1802,12 +1811,18 @@ function updateUI() {
 
     // Update weapon info
     const weaponInfo = document.getElementById('weaponInfo');
-    weaponInfo.innerHTML = `
+    let weaponListHTML = `
         <div style="color: ${weapon.color}; font-weight: bold;">${weapon.name}</div>
         <div>AMMO: ${weapon.currentAmmo}/${weapon.maxAmmo}</div>
         <div style="font-size: 11px; color: #aaa;">${weapon.description}</div>
         <div style="font-size: 11px; color: #aaa;">DMG: ${weapon.damage} | RATE: ${1000/weapon.fireRate}/s</div>
+        <div style="margin-top: 6px; font-size: 11px; color: #888;">— weapons —</div>
     `;
+    player.weapons.forEach((w, i) => {
+        const isActive = i === player.weaponIndex;
+        weaponListHTML += `<div class="weapon-list-item${isActive ? ' active' : ''}" style="color: ${isActive ? w.color : '#aaa'};">${isActive ? '► ' : '  '}${w.name}</div>`;
+    });
+    weaponInfo.innerHTML = weaponListHTML;
 
     // Update kill counter
     document.getElementById('killCounter').textContent = `KILLS: ${game.kills}`;
