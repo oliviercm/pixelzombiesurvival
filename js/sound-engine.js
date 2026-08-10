@@ -5,6 +5,9 @@ const SoundEngine = {
     audioContext: null,
     initialized: false,
     sounds: {},
+    activeReloadSource: null,
+    reloadStartTime: 0,
+    reloadBufferDuration: 0,
 
     // Initialize the AudioContext and preload weapon sounds
     init() {
@@ -179,13 +182,56 @@ const SoundEngine = {
     // ============================================
 
     // Play weapon-specific reload sound
-    playReload(soundPath) {
+    playReload(soundPath, resumeOffset = 0) {
         const buffer = this.sounds[soundPath];
-        if (buffer) {
-            this.playBuffer(buffer, 0.4);
-        } else {
+        if (!buffer) {
             console.warn(`No sound loaded for: ${soundPath}`);
+            return;
         }
+        // Stop any currently playing reload sound
+        this.stopReload();
+        this.resume();
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        const gainNode = this.audioContext.createGain();
+        gainNode.gain.value = 0.4;
+        source.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        const startTime = this.audioContext.currentTime;
+        source.start(startTime, resumeOffset);
+        this.activeReloadSource = source;
+        this.reloadStartTime = startTime;
+        this.reloadBufferDuration = buffer.duration;
+        source.onended = () => {
+            if (this.activeReloadSource === source) {
+                this.activeReloadSource = null;
+            }
+        };
+    },
+
+    // Get remaining time of the currently playing reload sound
+    getReloadRemaining() {
+        if (!this.activeReloadSource) return 0;
+        const elapsed = this.audioContext.currentTime - this.reloadStartTime;
+        const remaining = Math.max(0, this.reloadBufferDuration - elapsed);
+        return remaining;
+    },
+
+    // Pause the currently playing reload sound, return remaining time
+    stopReload() {
+        if (this.activeReloadSource) {
+            try {
+                this.activeReloadSource.stop();
+            } catch (e) { /* already stopped */ }
+            this.activeReloadSource = null;
+        }
+    },
+
+    // Get elapsed time of the currently playing reload sound (for resume offset)
+    getReloadElapsed() {
+        if (!this.activeReloadSource) return 0;
+        const elapsed = this.audioContext.currentTime - this.reloadStartTime;
+        return Math.min(elapsed, this.reloadBufferDuration);
     },
 
     // ============================================
@@ -196,7 +242,7 @@ const SoundEngine = {
     playChangeWeapon() {
         const buffer = this.sounds['changeweapon'];
         if (buffer) {
-            this.playBuffer(buffer, 1.0);
+            this.playBuffer(buffer, 0.3);
         }
     }
 };

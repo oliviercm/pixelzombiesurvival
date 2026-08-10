@@ -14,7 +14,7 @@ class Player {
         this.health = CONFIG.PLAYER_HEALTH;
         this.maxHealth = CONFIG.PLAYER_HEALTH;
         this.weaponIndex = 0;
-        this.weapons = WEAPONS.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0}));
+        this.weapons = WEAPONS.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0}));
         this.lastShot = 0;
         this.invincibleTimer = 0;
         this.facing = 0; // angle in radians
@@ -53,13 +53,35 @@ class Player {
         // Handle weapon switching
         if (keys['KeyQ']) {
             keys['KeyQ'] = false; // Reset to prevent rapid cycling
+            const prevIndex = this.weaponIndex;
             this.weaponIndex = (this.weaponIndex - 1 + this.weapons.length) % this.weapons.length;
             SoundEngine.playChangeWeapon();
+            // Pause reload sound on the weapon we just left and accumulate elapsed time
+            if (this.weapons[prevIndex].reloading) {
+                const elapsed = SoundEngine.getReloadElapsed();
+                this.weapons[prevIndex].reloadOffset += elapsed;
+                SoundEngine.stopReload();
+            }
+            // Resume reload sound if the weapon we switched to was reloading
+            if (this.weapons[this.weaponIndex].reloading && this.weapons[this.weaponIndex].reloadOffset > 0) {
+                SoundEngine.playReload(this.weapons[this.weaponIndex].sound + '-reload', this.weapons[this.weaponIndex].reloadOffset);
+            }
         }
         if (keys['KeyE']) {
             keys['KeyE'] = false;
+            const prevIndex = this.weaponIndex;
             this.weaponIndex = (this.weaponIndex + 1) % this.weapons.length;
             SoundEngine.playChangeWeapon();
+            // Pause reload sound on the weapon we just left and accumulate elapsed time
+            if (this.weapons[prevIndex].reloading) {
+                const elapsed = SoundEngine.getReloadElapsed();
+                this.weapons[prevIndex].reloadOffset += elapsed;
+                SoundEngine.stopReload();
+            }
+            // Resume reload sound if the weapon we switched to was reloading
+            if (this.weapons[this.weaponIndex].reloading && this.weapons[this.weaponIndex].reloadOffset > 0) {
+                SoundEngine.playReload(this.weapons[this.weaponIndex].sound + '-reload', this.weapons[this.weaponIndex].reloadOffset);
+            }
         }
 
         // Reload - press R
@@ -100,6 +122,7 @@ class Player {
         if (weapon.reloading) return; // already reloading
         weapon.reloading = true;
         weapon.reloadTimer = weapon.reloadTime;
+        weapon.reloadOffset = 0;
         SoundEngine.playReload(weapon.sound + '-reload');
     }
 
