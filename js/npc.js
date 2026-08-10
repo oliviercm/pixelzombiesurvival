@@ -258,7 +258,7 @@ class NPC extends FightingCharacter {
         const screenY = this.y - game.camera.y;
 
         // Draw NPC body (green color to distinguish from player)
-        ctx.fillStyle = '#44aa44';
+        ctx.fillStyle = '#55bb55';
         ctx.fillRect(screenX - this.width/2, screenY - this.height/2, this.width, this.height);
 
         // Draw NPC head
@@ -272,11 +272,6 @@ class NPC extends FightingCharacter {
         ctx.fillStyle = '#666666';
         ctx.fillRect(10, -3, 15, 6);
         ctx.restore();
-
-        // Draw eyes
-        ctx.fillStyle = '#00ff00';
-        ctx.fillRect(screenX - 5, screenY - this.height/2 - 7, 3, 3);
-        ctx.fillRect(screenX + 2, screenY - this.height/2 - 7, 3, 3);
 
         // Draw health bar above NPC
         const healthPercent = this.health / this.maxHealth;
