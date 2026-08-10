@@ -99,15 +99,15 @@ class Pickup {
             player.weapons.forEach(w => {
                 w.reserveAmmo += ammoPerWeapon;
             });
-            // Cancel reload if one is in progress — fill clip from reserve
-            if (player.reloading) {
-                player.reloading = false;
-                player.reloadTimer = 0;
-                const weapon = player.weapons[player.weaponIndex];
-                const needed = weapon.clipSize - weapon.currentAmmo;
-                const available = Math.min(needed, weapon.reserveAmmo);
-                weapon.currentAmmo += available;
-                weapon.reserveAmmo -= available;
+            // Cancel reload if the current weapon is reloading — fill clip from reserve
+            const currentWeapon = player.weapons[player.weaponIndex];
+            if (currentWeapon.reloading) {
+                currentWeapon.reloading = false;
+                currentWeapon.reloadTimer = 0;
+                const needed = currentWeapon.clipSize - currentWeapon.currentAmmo;
+                const available = Math.min(needed, currentWeapon.reserveAmmo);
+                currentWeapon.currentAmmo += available;
+                currentWeapon.reserveAmmo -= available;
             }
             return true;
         }
