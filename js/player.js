@@ -174,6 +174,31 @@ class Player extends FightingCharacter {
                 });
             }
         }
+
+        // Emit shell casing from the weapon
+        const shellDef = SHELL_TYPES[weapon.sound];
+        if (shellDef) {
+            // Shell ejects perpendicular to firing angle, slightly upward
+            const ejectAngle = this.facing + Math.PI / 2 + (Math.random() - 0.5) * 0.5;
+            const shellOriginX = this.x + Math.cos(this.facing) * 18;
+            const shellOriginY = this.y + Math.sin(this.facing) * 18;
+            game.particles.push({
+                x: shellOriginX,
+                y: shellOriginY,
+                vx: Math.cos(ejectAngle) * (Math.random() * 2 + 2),
+                vy: Math.sin(ejectAngle) * (Math.random() * 2 + 2),
+                life: 4000,
+                maxLife: 4000,
+                color: shellDef.color,
+                size: 1,
+                isShell: true,
+                shellWidth: shellDef.width,
+                shellHeight: shellDef.height,
+                rotation: this.facing + Math.PI / 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.2,
+                friction: 0.95
+            });
+        }
     }
 
     takeDamage(amount) {

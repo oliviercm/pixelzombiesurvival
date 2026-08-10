@@ -485,6 +485,30 @@ function updateParticles(deltaTime) {
                 particle.vx *= decayFactor;
                 particle.vy *= decayFactor;
             }
+
+            // Shell-specific physics: friction and rotation
+            if (particle.isShell) {
+                const friction = particle.friction || 0.95;
+                const settleThreshold = 0.05;
+
+                // Check if shell has mostly settled
+                const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+                const rotSpeed = Math.abs(particle.rotationSpeed || 0);
+
+                if (speed < settleThreshold && rotSpeed < 0.01) {
+                    // Fully settled — stop all motion and rotation
+                    particle.vx = 0;
+                    particle.vy = 0;
+                    particle.rotationSpeed = 0;
+                } else {
+                    // Friction on translation (same in all directions)
+                    particle.vx *= Math.pow(friction, timeScale);
+                    particle.vy *= Math.pow(friction, timeScale);
+                    // Friction on rotation
+                    particle.rotationSpeed *= Math.pow(friction, timeScale);
+                    particle.rotation += (particle.rotationSpeed || 0) * timeScale;
+                }
+            }
         }
         
         particle.life -= deltaTime;
@@ -567,18 +591,29 @@ function drawGame() {
     // Clear and draw background
     drawBackground();
 
-    // Draw blood splatter particles (underneath everything)
+    // Draw blood splatter and shell casings (underneath everything)
     game.particles.forEach(particle => {
+        const screenX = particle.x - game.camera.x;
+        const screenY = particle.y - game.camera.y;
+        const lifeRatio = particle.life / particle.maxLife;
+
         if (particle.isSplatter) {
-            const screenX = particle.x - game.camera.x;
-            const screenY = particle.y - game.camera.y;
-            const lifeRatio = particle.life / particle.maxLife;
             const splatterAlpha = Math.max(0.3, lifeRatio);
             const displaySize = particle.size * 1.5;
-
             ctx.globalAlpha = splatterAlpha;
             ctx.fillStyle = particle.color;
             ctx.fillRect(screenX - displaySize/2, screenY - displaySize/2, displaySize, displaySize);
+            ctx.globalAlpha = 1;
+        } else if (particle.isShell) {
+            ctx.globalAlpha = lifeRatio;
+            ctx.fillStyle = particle.color;
+            ctx.save();
+            ctx.translate(screenX, screenY);
+            ctx.rotate(particle.rotation);
+            const w = particle.shellWidth || 3;
+            const h = particle.shellHeight || 6;
+            ctx.fillRect(-w / 2, -h / 2, w, h);
+            ctx.restore();
             ctx.globalAlpha = 1;
         }
     });
@@ -639,7 +674,7 @@ function drawGame() {
 
     // Draw regular particles (on top of everything)
     game.particles.forEach(particle => {
-        if (!particle.isSplatter) {
+        if (!particle.isSplatter && !particle.isShell) {
             const screenX = particle.x - game.camera.x;
             const screenY = particle.y - game.camera.y;
             const lifeRatio = particle.life / particle.maxLife;

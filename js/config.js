@@ -108,6 +108,23 @@ const ZombieTypes = {
 };
 
 // ============================================
+// SHELL CASING DEFINITIONS
+// Each entry maps a weapon sound to its shell shape and color.
+// ============================================
+const SHELL_TYPES = {
+    glock:    { width: 2, height: 3,  color: '#ffd700' },
+    mp5:      { width: 2, height: 3,  color: '#ffd700' },
+    ak47:     { width: 2, height: 5,  color: '#ffd700' },
+    barretm82:{ width: 2, height: 7,  color: '#ffd700' },
+    m249:     { width: 2, height: 5,  color: '#ffd700' },
+    minigun:  { width: 2, height: 5,  color: '#ffd700' },
+    r870:     { width: 3, height: 5,  color: '#ff4444' },
+    mossberg: { width: 4, height: 6,  color: '#ff4444' },
+    m79:      { width: 5, height: 5,  color: '#b8860b' },
+    law:      { width: 15, height: 6, color: '#888888' }
+};
+
+// ============================================
 // WEAPON DEFINITIONS
 // ============================================
 const WEAPONS = [
