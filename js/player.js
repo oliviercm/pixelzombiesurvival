@@ -106,8 +106,14 @@ class Player {
         const weapon = this.weapons[this.weaponIndex];
         const now = Date.now();
 
-        // Check if weapon has clip ammo and cooldown is ready
-        if (weapon.currentAmmo <= 0 || now - this.lastShot < weapon.fireRate) return;
+        // Auto-reload when clip is empty
+        if (weapon.currentAmmo <= 0) {
+            this.reload();
+            return;
+        }
+
+        // Check if cooldown is ready
+        if (now - this.lastShot < weapon.fireRate) return;
 
         // Deduct ammo
         weapon.currentAmmo--;
