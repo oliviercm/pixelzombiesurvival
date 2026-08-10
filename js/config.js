@@ -115,6 +115,7 @@ const WEAPONS = [
         spread: 0.02,
         color: "#888888",
         bulletSize: 3,
+        sound: "glock",
         description: "Reliable sidearm"
     },
     {
@@ -129,7 +130,8 @@ const WEAPONS = [
         spread: 0.04,
         color: "#ff6600",
         bulletSize: 3,
-        description: "Semi-automatic rifle"
+        sound: "ak47",
+        description: "Automatic rifle"
     },
     {
         name: "MP5 Submachine Gun",
@@ -143,6 +145,7 @@ const WEAPONS = [
         spread: 0.05,
         color: "#00ff00",
         bulletSize: 2,
+        sound: "mp5",
         description: "High rate of fire"
     },
     {
@@ -157,6 +160,7 @@ const WEAPONS = [
         spread: 0.15,
         color: "#ff0000",
         bulletSize: 2,
+        sound: "r870",
         description: "Close-range devastation"
     },
     {
@@ -171,6 +175,7 @@ const WEAPONS = [
         spread: 0.005,
         color: "#0000ff",
         bulletSize: 4,
+        sound: "barretm82",
         description: "Long-range precision"
     },
     {
@@ -186,6 +191,7 @@ const WEAPONS = [
         color: "#888800",
         bulletSize: 6,
         explosionRadius: 75,
+        sound: "m79",
         description: "Explosive ordnance"
     },
     {
@@ -200,6 +206,7 @@ const WEAPONS = [
         spread: 0.20,
         color: "#cc6600",
         bulletSize: 2,
+        sound: "mossberg",
         description: "Pump-action power"
     },
     {
@@ -214,6 +221,7 @@ const WEAPONS = [
         spread: 0.06,
         color: "#ffff00",
         bulletSize: 3,
+        sound: "m249",
         description: "Sustained fire"
     },
     {
@@ -229,10 +237,11 @@ const WEAPONS = [
         color: "#ff00ff",
         bulletSize: 8,
         explosionRadius: 140,
+        sound: "law",
         description: "Heavy anti-armor weapon"
     },
     {
-        name: "GAU-17/A Machine Gun",
+        name: "M134 Minigun",
         clipSize: 100,
         ammo: 500,
         fireRate: 40,
@@ -243,23 +252,7 @@ const WEAPONS = [
         spread: 0.07,
         color: "#00ffff",
         bulletSize: 3,
-        description: "Phased cannon"
+        sound: "minigun",
+        description: "Hail of bullets"
     }
 ];
-
-// ============================================
-// WEAPON TYPE HELPER - Maps weapon name to sound category
-// ============================================
-function getWeaponType(weapon) {
-    const name = weapon.name.toLowerCase();
-    if (name.includes('pistol')) return 'pistol';
-    if (name.includes('rifle')) return 'rifle';
-    if (name.includes('mp5') || name.includes('smg')) return 'smg';
-    if (name.includes('shotgun')) return 'shotgun';
-    if (name.includes('sniper')) return 'sniper';
-    if (name.includes('m79')) return 'm79';
-    if (name.includes('law') || name.includes('rocket')) return 'law';
-    if (name.includes('m249') || name.includes('light')) return 'lightmg';
-    if (name.includes('gau') || name.includes('heavy')) return 'heavymg';
-    return 'rifle'; // default
-}

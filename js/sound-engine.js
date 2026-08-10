@@ -18,18 +18,19 @@ const SoundEngine = {
         this.preloadSounds();
     },
 
-    // Preload all weapon WAV files into AudioBuffers
+    // Preload all WAV files into AudioBuffers
     async preloadSounds() {
         const soundFiles = {
-            pistol: 'sounds/glock-fire.wav',
-            rifle: 'sounds/ak47-fire.wav',
-            smg: 'sounds/mp5-fire.wav',
-            shotgun: 'sounds/r870-fire.wav',
-            sniper: 'sounds/barretm82-fire.wav',
+            glock: 'sounds/glock-fire.wav',
+            ak47: 'sounds/ak47-fire.wav',
+            mp5: 'sounds/mp5-fire.wav',
+            r870: 'sounds/r870-fire.wav',
+            barretm82: 'sounds/barretm82-fire.wav',
             m79: 'sounds/m79-fire.wav',
-            law: 'sounds/law.wav',
-            lightmg: 'sounds/m249-fire.wav',
-            heavymg: 'sounds/gau17-fire.wav',
+            mossberg: 'sounds/mossberg-fire.wav',
+            law: 'sounds/law-fire.wav',
+            m249: 'sounds/m249-fire.wav',
+            minigun: 'sounds/minigun-fire.wav',
             zombiehit: 'sounds/zombiehit.wav',
             zombiehit2: 'sounds/zombiehit2.wav',
             zombiehit3: 'sounds/zombiehit3.wav',
@@ -84,14 +85,13 @@ const SoundEngine = {
         source.start();
     },
 
-    // Weapon-specific gunshot sounds - plays preloaded WAV files
-    playShoot(weaponType = 'rifle') {
-        const buffer = this.sounds[weaponType];
+    // Weapon-specific gunshot sounds - plays preloaded WAV file by path
+    playShoot(soundPath) {
+        const buffer = this.sounds[soundPath];
         if (buffer) {
             this.playBuffer(buffer, 0.4);
         } else {
-            // Fallback to synthesized sound if WAV not loaded
-            console.warn(`No sound loaded for weapon type: ${weaponType}`);
+            console.warn(`No sound loaded for: ${soundPath}`);
         }
     },
 

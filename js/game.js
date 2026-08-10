@@ -220,7 +220,7 @@ function updateBullets(deltaTime) {
                 const killed = zombie.takeDamage(bullet.damage);
 
                 // Play meaty hit sound with weapon context
-                SoundEngine.playHit(bullet.weaponType);
+                SoundEngine.playHit(bullet.sound);
 
                 // Create explosion if applicable
                 if (bullet.explosionRadius > 0) {
@@ -254,7 +254,7 @@ function updateBullets(deltaTime) {
                 if (dist < bullet.size + Math.max(barrel.width, barrel.height) / 2) {
                     barrelHit = true;
                     barrel.takeDamage(bullet.damage);
-                    SoundEngine.playHit(bullet.weaponType);
+                    SoundEngine.playHit(bullet.sound);
                     break;
                 }
             }

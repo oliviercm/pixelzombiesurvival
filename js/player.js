@@ -120,7 +120,7 @@ class Player {
         this.lastShot = now;
 
         // Play weapon-specific shoot sound
-        SoundEngine.playShoot(getWeaponType(weapon));
+        SoundEngine.playShoot(weapon.sound);
 
         // Create bullets based on weapon type
         for (let i = 0; i < weapon.bulletCount; i++) {
@@ -139,7 +139,7 @@ class Player {
                 life: 3000, // bullets last 3 seconds
                 explosionRadius: weapon.explosionRadius || 0,
                 isExploding: false,
-                weaponType: getWeaponType(weapon) // for sound context
+                sound: weapon.sound // for sound context
             };
 
             game.bullets.push(bullet);
