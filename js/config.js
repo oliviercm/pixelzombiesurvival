@@ -28,6 +28,14 @@ const CONFIG = {
     BARREL_HEALTH_MIN: 30,
     BARREL_HEALTH_MAX: 50,
     RELOAD_KEY: 'KeyR',
+    NPC_HEALTH: 80,
+    NPC_SIZE: 20,
+    NPC_SPEED: 2,
+    NPC_MOVE_INTERVAL: 3000,
+    NPC_MIN_DISTANCE: 50,
+    NPC_MAX_DISTANCE: 150,
+    NPC_SPAWN_DISTANCE: 200,
+    MAX_NPCS: 5,
 };
 
 // ============================================

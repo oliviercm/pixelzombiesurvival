@@ -7,6 +7,7 @@ let game = {
     running: false,
     paused: false,
     player: null,
+    npcs: [],
     bullets: [],
     zombies: [],
     pickups: [],
@@ -48,6 +49,7 @@ function initGame() {
 
     // Reset game state
     game.player = new Player(game.worldWidth / 2, game.worldHeight / 2);
+    game.npcs = [];
     game.bullets = [];
     game.zombies = [];
     game.pickups = [];
@@ -134,6 +136,23 @@ function spawnZombie() {
     
     game.zombies.push(new Zombie(x, y, zombieType));
     game.zombiesInWave++;
+}
+
+/**
+ * Spawn a friendly NPC near the player
+ */
+function spawnNPC() {
+    if (game.npcs.length >= CONFIG.MAX_NPCS) return;
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = CONFIG.NPC_SPAWN_DISTANCE;
+    const x = game.player.x + Math.cos(angle) * distance;
+    const y = game.player.y + Math.sin(angle) * distance;
+
+    const clampedX = Math.max(CONFIG.NPC_SIZE, Math.min(game.worldWidth - CONFIG.NPC_SIZE, x));
+    const clampedY = Math.max(CONFIG.NPC_SIZE, Math.min(game.worldHeight - CONFIG.NPC_SIZE, y));
+
+    game.npcs.push(new NPC(clampedX, clampedY));
 }
 
 /**
@@ -576,6 +595,9 @@ function drawGame() {
     // Draw player
     game.player.draw(ctx);
 
+    // Draw NPCs
+    game.npcs.forEach(npc => npc.draw(ctx));
+
     // Draw bullets
     game.bullets.forEach(bullet => {
         const screenX = bullet.x - game.camera.x;
@@ -732,6 +754,9 @@ function gameLoop(timestamp) {
     // Update player
     game.player.update(deltaTime);
 
+    // Update NPCs
+    game.npcs.forEach(npc => npc.update(deltaTime));
+
     // Update camera
     updateCamera();
 
@@ -752,6 +777,7 @@ function gameLoop(timestamp) {
         game.zombiesToSpawn = CONFIG.ZOMBIES_PER_WAVE + (game.wave - 1) * 2;
         CONFIG.ZOMBIE_SPAWN_INTERVAL = Math.max(1000, 3000 - game.wave * 100);
         spawnBarrels();
+        spawnNPC();
     }
 
     // Spawn pickups

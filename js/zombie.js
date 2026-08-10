@@ -33,10 +33,22 @@ class Zombie {
     }
 
     update(deltaTime) {
-        // Move toward player (speed is pixels per second)
+        // Find closest target (player or NPC)
+        let closestTarget = game.player;
+        let closestDist = Math.sqrt((game.player.x - this.x) ** 2 + (game.player.y - this.y) ** 2);
+
+        for (const npc of game.npcs) {
+            const dist = Math.sqrt((npc.x - this.x) ** 2 + (npc.y - this.y) ** 2);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestTarget = npc;
+            }
+        }
+
+        // Move toward closest target (speed is pixels per second)
         const timeScale = deltaTime / 16.67;
-        const dx = game.player.x - this.x;
-        const dy = game.player.y - this.y;
+        const dx = closestTarget.x - this.x;
+        const dy = closestTarget.y - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > 0) {
@@ -44,20 +56,20 @@ class Zombie {
             this.y += (dy / distance) * this.speed * timeScale;
         }
 
-        // Prevent clipping into the player
-        const minDist = (game.player.width + this.width) / 2;
+        // Prevent clipping into the target
+        const minDist = (closestTarget.width + this.width) / 2;
         if (distance < minDist && distance > 0) {
             const nx = dx / distance;
             const ny = dy / distance;
-            this.x = game.player.x - nx * minDist;
-            this.y = game.player.y - ny * minDist;
+            this.x = closestTarget.x - nx * minDist;
+            this.y = closestTarget.y - ny * minDist;
         }
 
-        // Attack player if close enough
+        // Attack target if close enough
         if (distance < 25) {
             const now = Date.now();
             if (now - this.lastAttack > this.attackCooldown) {
-                if (game.player.takeDamage(this.damage)) {
+                if (closestTarget.takeDamage(this.damage)) {
                     this.lastAttack = now;
                 }
             }
