@@ -22,15 +22,25 @@ const SoundEngine = {
     async preloadSounds() {
         const soundFiles = {
             glock: 'sounds/glock-fire.wav',
+            'glock-reload': 'sounds/glock-reload.wav',
             ak47: 'sounds/ak47-fire.wav',
+            'ak47-reload': 'sounds/ak47-reload.wav',
             mp5: 'sounds/mp5-fire.wav',
+            'mp5-reload': 'sounds/mp5-reload.wav',
             r870: 'sounds/r870-fire.wav',
+            'r870-reload': 'sounds/r870-reload.wav',
             barretm82: 'sounds/barretm82-fire.wav',
+            'barretm82-reload': 'sounds/barretm82-reload.wav',
             m79: 'sounds/m79-fire.wav',
+            'm79-reload': 'sounds/m79-reload.wav',
             mossberg: 'sounds/mossberg-fire.wav',
+            'mossberg-reload': 'sounds/mossberg-reload.wav',
             law: 'sounds/law-fire.wav',
+            'law-reload': 'sounds/law-reload.wav',
             m249: 'sounds/m249-fire.wav',
+            'm249-reload': 'sounds/m249-reload.wav',
             minigun: 'sounds/minigun-fire.wav',
+            'minigun-reload': 'sounds/minigun-reload.wav',
             zombiehit: 'sounds/zombiehit.wav',
             zombiehit2: 'sounds/zombiehit2.wav',
             zombiehit3: 'sounds/zombiehit3.wav',
@@ -161,6 +171,20 @@ const SoundEngine = {
         const buffer = this.sounds[key];
         if (buffer) {
             this.playBuffer(buffer, 1.0);
+        }
+    },
+
+    // ============================================
+    // WEAPON RELOAD SOUND
+    // ============================================
+
+    // Play weapon-specific reload sound
+    playReload(soundPath) {
+        const buffer = this.sounds[soundPath];
+        if (buffer) {
+            this.playBuffer(buffer, 0.4);
+        } else {
+            console.warn(`No sound loaded for: ${soundPath}`);
         }
     },
 

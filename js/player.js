@@ -100,6 +100,7 @@ class Player {
         if (weapon.reloading) return; // already reloading
         weapon.reloading = true;
         weapon.reloadTimer = weapon.reloadTime;
+        SoundEngine.playReload(weapon.sound + '-reload');
     }
 
     shoot() {
