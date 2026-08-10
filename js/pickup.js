@@ -94,10 +94,10 @@ class Pickup {
             player.health = Math.min(player.maxHealth, player.health + Math.floor(player.maxHealth * CONFIG.HEALTH_PICKUP_PERCENT / 100));
             return true;
         } else {
-            // Add 10% of max ammo to reserve for every weapon
-            const ammoPerWeapon = Math.floor(CONFIG.AMMO_PICKUP_PERCENT / 100 * 10); // 10%
+            // Add 10% of each weapon's max reserve to reserve, capped at max
             player.weapons.forEach(w => {
-                w.reserveAmmo += ammoPerWeapon;
+                const add = Math.floor(w.ammo * CONFIG.AMMO_PICKUP_PERCENT / 100);
+                w.reserveAmmo = Math.min(w.ammo, w.reserveAmmo + add);
             });
             // Cancel reload if the current weapon is reloading — fill clip from reserve
             const currentWeapon = player.weapons[player.weaponIndex];

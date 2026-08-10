@@ -68,13 +68,13 @@ class Player {
             this.reload();
         }
 
-        // Shooting - respond to both spacebar and mouse click
-        if (keys['Space'] || game.mouseClick) {
-            this.shoot();
-        }
-
         // Update reload timer for the currently equipped weapon only
         const currentWeapon = this.weapons[this.weaponIndex];
+
+        // Shooting - respond to both spacebar and mouse click (blocked while reloading)
+        if ((keys['Space'] || game.mouseClick) && !currentWeapon.reloading) {
+            this.shoot();
+        }
         if (currentWeapon.reloading) {
             currentWeapon.reloadTimer -= deltaTime;
             if (currentWeapon.reloadTimer <= 0) {
