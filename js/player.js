@@ -14,7 +14,7 @@ class Player {
         this.health = CONFIG.PLAYER_HEALTH;
         this.maxHealth = CONFIG.PLAYER_HEALTH;
         this.weaponIndex = 0;
-        this.weapons = WEAPONS.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0}));
+        this.weapons = WEAPONS.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0, reloadOneAtATime: w.reloadOneAtATime}));
         this.lastShot = 0;
         this.invincibleTimer = 0;
         this.facing = 0; // angle in radians
@@ -93,19 +93,42 @@ class Player {
         // Update reload timer for the currently equipped weapon only
         const currentWeapon = this.weapons[this.weaponIndex];
 
-        // Shooting - respond to both spacebar and mouse click (blocked while reloading)
-        if ((keys['Space'] || game.mouseClick) && !currentWeapon.reloading) {
-            this.shoot();
+        // Shooting - respond to both spacebar and mouse click (blocked while reloading, unless shotgun)
+        if (keys['Space'] || game.mouseClick) {
+            if (currentWeapon.reloading && currentWeapon.reloadOneAtATime && currentWeapon.currentAmmo > 0) {
+                // Cancel reload and fire the remaining shell
+                currentWeapon.reloading = false;
+                currentWeapon.reloadTimer = 0;
+                SoundEngine.stopReload();
+                this.shoot();
+            } else if (!currentWeapon.reloading) {
+                this.shoot();
+            }
         }
         if (currentWeapon.reloading) {
             currentWeapon.reloadTimer -= deltaTime;
             if (currentWeapon.reloadTimer <= 0) {
                 currentWeapon.reloadTimer = 0;
-                currentWeapon.reloading = false;
-                const needed = currentWeapon.clipSize - currentWeapon.currentAmmo;
-                const available = Math.min(needed, currentWeapon.reserveAmmo);
-                currentWeapon.currentAmmo += available;
-                currentWeapon.reserveAmmo -= available;
+                if (currentWeapon.reloadOneAtATime) {
+                    // One-shell reload: add exactly one shell
+                    const canAdd = Math.min(1, currentWeapon.reserveAmmo);
+                    currentWeapon.currentAmmo += canAdd;
+                    currentWeapon.reserveAmmo -= canAdd;
+                    if (currentWeapon.currentAmmo < currentWeapon.clipSize && currentWeapon.reserveAmmo > 0) {
+                        // Start next shell reload and play sound
+                        currentWeapon.reloadTimer = currentWeapon.reloadTime;
+                        SoundEngine.playReload(currentWeapon.sound + '-reload');
+                    } else {
+                        currentWeapon.reloading = false;
+                    }
+                } else {
+                    // Full clip reload
+                    const needed = currentWeapon.clipSize - currentWeapon.currentAmmo;
+                    const available = Math.min(needed, currentWeapon.reserveAmmo);
+                    currentWeapon.currentAmmo += available;
+                    currentWeapon.reserveAmmo -= available;
+                    currentWeapon.reloading = false;
+                }
             }
         }
 
@@ -129,6 +152,13 @@ class Player {
     shoot() {
         const weapon = this.weapons[this.weaponIndex];
         const now = Date.now();
+
+        // If reloading one-at-a-time and there's a shell in the clip, cancel reload and fire
+        if (weapon.reloading && weapon.reloadOneAtATime && weapon.currentAmmo > 0) {
+            weapon.reloading = false;
+            weapon.reloadTimer = 0;
+            SoundEngine.stopReload();
+        }
 
         // Auto-reload when clip is empty
         if (weapon.currentAmmo <= 0) {

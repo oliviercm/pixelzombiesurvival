@@ -152,8 +152,8 @@ const WEAPONS = [
         name: "Remington 870 Shotgun",
         clipSize: 8,
         ammo: 80,
-        fireRate: 600,
-        reloadTime: 3000,
+        fireRate: 500,
+        reloadTime: 800,
         bulletSpeed: 10,
         damage: 12,
         bulletCount: 8,
@@ -161,7 +161,8 @@ const WEAPONS = [
         color: "#ff0000",
         bulletSize: 2,
         sound: "r870",
-        description: "Close-range devastation"
+        description: "Close-range devastation",
+        reloadOneAtATime: true
     },
     {
         name: "Barrett M82A1 Sniper",
@@ -198,8 +199,8 @@ const WEAPONS = [
         name: "Mossberg 500 Shotgun",
         clipSize: 5,
         ammo: 60,
-        fireRate: 800,
-        reloadTime: 3500,
+        fireRate: 600,
+        reloadTime: 1000,
         bulletSpeed: 10,
         damage: 15,
         bulletCount: 10,
@@ -207,7 +208,8 @@ const WEAPONS = [
         color: "#cc6600",
         bulletSize: 2,
         sound: "mossberg",
-        description: "Pump-action power"
+        description: "Pump-action power",
+        reloadOneAtATime: true
     },
     {
         name: "M249 Light Machine Gun",

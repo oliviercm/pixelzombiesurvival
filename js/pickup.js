@@ -99,16 +99,7 @@ class Pickup {
                 const add = Math.floor(w.ammo * CONFIG.AMMO_PICKUP_PERCENT / 100);
                 w.reserveAmmo = Math.min(w.ammo, w.reserveAmmo + add);
             });
-            // Cancel reload if the current weapon is reloading — fill clip from reserve
-            const currentWeapon = player.weapons[player.weaponIndex];
-            if (currentWeapon.reloading) {
-                currentWeapon.reloading = false;
-                currentWeapon.reloadTimer = 0;
-                const needed = currentWeapon.clipSize - currentWeapon.currentAmmo;
-                const available = Math.min(needed, currentWeapon.reserveAmmo);
-                currentWeapon.currentAmmo += available;
-                currentWeapon.reserveAmmo -= available;
-            }
+
             return true;
         }
     }
