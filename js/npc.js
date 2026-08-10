@@ -169,11 +169,11 @@ class FightingCharacter {
  */
 class NPC extends FightingCharacter {
     constructor(x, y) {
-        // Pick a random weapon, give NPC 3x the reserve ammo so they last longer
+        // Pick a random weapon with unlimited ammo
         const randomWeapon = WEAPONS[Math.floor(Math.random() * WEAPONS.length)];
         const weaponConfig = {
             ...randomWeapon,
-            ammo: randomWeapon.ammo * 3
+            ammo: Infinity
         };
         super(x, y, CONFIG.NPC_HEALTH, CONFIG.NPC_HEALTH, CONFIG.NPC_SIZE, CONFIG.NPC_SIZE, [weaponConfig]);
 
