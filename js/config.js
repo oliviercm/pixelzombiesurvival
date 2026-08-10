@@ -1,0 +1,254 @@
+// ============================================
+// GAME CONFIGURATION
+// ============================================
+const CONFIG = {
+    CANVAS_WIDTH: 1200,
+    CANVAS_HEIGHT: 800,
+    TARGET_FPS: 60,
+    PLAYER_SPEED: 3,
+    PLAYER_SIZE: 20,
+    PLAYER_HEALTH: 100,
+    ZOMBIE_SIZE: 20,
+    PICKUP_SIZE: 12,
+    PICKUP_SPAWN_INTERVAL: 10000,
+    PICKUP_LIFETIME: 60000,
+    MAX_PICKUPS: 5,
+    INITIAL_ZOMBIE_COUNT: 10,
+    ZOMBIE_SPAWN_INTERVAL: 3000,
+    WAVE_DURATION: 60000,
+    ZOMBIES_PER_WAVE: 20,
+    MAX_ZOMBIES: 100,
+    AMMO_PICKUP_PERCENT: 10,
+    HEALTH_PICKUP_PERCENT: 15,
+    CURSOR_SIZE: 8,
+    ZOMBIE_SPAWN_GROUP_MIN: 3,
+    ZOMBIE_SPAWN_GROUP_MAX: 5,
+    BARRELS_PER_WAVE_MIN: 1,
+    BARRELS_PER_WAVE_MAX: 3,
+    BARREL_HEALTH_MIN: 30,
+    BARREL_HEALTH_MAX: 50,
+};
+
+// ============================================
+// ZOMBIE TYPE DEFINITIONS
+// Each zombie type is defined as a data object.
+// Adding a new type only requires adding an entry here.
+// ============================================
+const ZombieTypes = {
+    normal: {
+        name: 'Normal Zombie',
+        speed: 2,
+        health: 40,
+        damage: 10,
+        colors: {
+            body: '#888888',
+            head: '#777777',
+            eyes: '#00ff00',
+            healthBar: '#888888',
+            hitParticle: '#888888',
+            deathParticle: '#666666'
+        },
+        spawnChance: 0.50
+    },
+    demon: {
+        name: 'Demon Zombie',
+        speed: 2.5,
+        health: 60,
+        damage: 25,
+        colors: {
+            body: '#cc0000',
+            head: '#aa0000',
+            eyes: '#ffffff',
+            healthBar: '#ff0000',
+            hitParticle: '#ff0000',
+            deathParticle: '#aa0000'
+        },
+        spawnChance: 0.20
+    },
+    fast: {
+        name: 'Fast Zombie',
+        speed: 3,
+        health: 30,
+        damage: 10,
+        colors: {
+            body: '#ffff00',
+            head: '#ffdd00',
+            eyes: '#ff0000',
+            healthBar: '#ffff00',
+            hitParticle: '#ffff00',
+            deathParticle: '#ffdd00'
+        },
+        spawnChance: 0.15
+    },
+    boomer: {
+        name: 'Boomer Zombie',
+        speed: 1.5,
+        health: 50,
+        damage: 15,
+        size: 1.4,
+        colors: {
+            body: '#44aa44',
+            head: '#338833',
+            eyes: '#ff0000',
+            healthBar: '#44aa44',
+            hitParticle: '#44aa44',
+            deathParticle: '#66cc66'
+        },
+        spawnChance: 0.15
+    }
+};
+
+// ============================================
+// WEAPON DEFINITIONS
+// ============================================
+const WEAPONS = [
+    {
+        name: "Glock Pistol",
+        ammo: 120,
+        maxAmmo: 120,
+        fireRate: 300,
+        bulletSpeed: 10,
+        damage: 15,
+        bulletCount: 1,
+        spread: 0.02,
+        color: "#888888",
+        bulletSize: 3,
+        description: "Reliable sidearm"
+    },
+    {
+        name: "AK-47 Assault Rifle",
+        ammo: 300,
+        maxAmmo: 300,
+        fireRate: 100,
+        bulletSpeed: 12,
+        damage: 25,
+        bulletCount: 1,
+        spread: 0.04,
+        color: "#ff6600",
+        bulletSize: 3,
+        description: "Semi-automatic rifle"
+    },
+    {
+        name: "MP5 Submachine Gun",
+        ammo: 250,
+        maxAmmo: 250,
+        fireRate: 70,
+        bulletSpeed: 11,
+        damage: 18,
+        bulletCount: 1,
+        spread: 0.05,
+        color: "#00ff00",
+        bulletSize: 2,
+        description: "High rate of fire"
+    },
+    {
+        name: "Remington 870 Shotgun",
+        ammo: 80,
+        maxAmmo: 80,
+        fireRate: 600,
+        bulletSpeed: 10,
+        damage: 12,
+        bulletCount: 8,
+        spread: 0.15,
+        color: "#ff0000",
+        bulletSize: 2,
+        description: "Close-range devastation"
+    },
+    {
+        name: "Barrett M82A1 Sniper",
+        ammo: 50,
+        maxAmmo: 50,
+        fireRate: 1000,
+        bulletSpeed: 25,
+        damage: 100,
+        bulletCount: 1,
+        spread: 0.005,
+        color: "#0000ff",
+        bulletSize: 4,
+        description: "Long-range precision"
+    },
+    {
+        name: "M79 Grenade Launcher",
+        ammo: 30,
+        maxAmmo: 30,
+        fireRate: 1200,
+        bulletSpeed: 8,
+        damage: 80,
+        bulletCount: 1,
+        spread: 0.03,
+        color: "#888800",
+        bulletSize: 6,
+        explosionRadius: 75,
+        description: "Explosive ordnance"
+    },
+    {
+        name: "Mossberg 500 Shotgun",
+        ammo: 60,
+        maxAmmo: 60,
+        fireRate: 800,
+        bulletSpeed: 10,
+        damage: 15,
+        bulletCount: 10,
+        spread: 0.20,
+        color: "#cc6600",
+        bulletSize: 2,
+        description: "Pump-action power"
+    },
+    {
+        name: "M249 Light Machine Gun",
+        ammo: 400,
+        maxAmmo: 400,
+        fireRate: 50,
+        bulletSpeed: 12,
+        damage: 20,
+        bulletCount: 1,
+        spread: 0.06,
+        color: "#ffff00",
+        bulletSize: 3,
+        description: "Sustained fire"
+    },
+    {
+        name: "M72 LAW Rocket Launcher",
+        ammo: 10,
+        maxAmmo: 10,
+        fireRate: 2400,
+        bulletSpeed: 7,
+        damage: 150,
+        bulletCount: 1,
+        spread: 0.02,
+        color: "#ff00ff",
+        bulletSize: 8,
+        explosionRadius: 140,
+        description: "Heavy anti-armor weapon"
+    },
+    {
+        name: "GAU-17/A Machine Gun",
+        ammo: 500,
+        maxAmmo: 500,
+        fireRate: 40,
+        bulletSpeed: 14,
+        damage: 22,
+        bulletCount: 1,
+        spread: 0.07,
+        color: "#00ffff",
+        bulletSize: 3,
+        description: "Phased cannon"
+    }
+];
+
+// ============================================
+// WEAPON TYPE HELPER - Maps weapon name to sound category
+// ============================================
+function getWeaponType(weapon) {
+    const name = weapon.name.toLowerCase();
+    if (name.includes('pistol')) return 'pistol';
+    if (name.includes('rifle')) return 'rifle';
+    if (name.includes('mp5') || name.includes('smg')) return 'smg';
+    if (name.includes('shotgun')) return 'shotgun';
+    if (name.includes('sniper')) return 'sniper';
+    if (name.includes('m79')) return 'm79';
+    if (name.includes('law') || name.includes('rocket')) return 'law';
+    if (name.includes('m249') || name.includes('light')) return 'lightmg';
+    if (name.includes('gau') || name.includes('heavy')) return 'heavymg';
+    return 'rifle'; // default
+}
