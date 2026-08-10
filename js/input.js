@@ -16,6 +16,21 @@ document.addEventListener('keyup', (e) => {
     keys[e.code] = false;
 });
 
+// ESC key toggles pause
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape' && game.running) {
+        game.paused = !game.paused;
+        e.preventDefault();
+    }
+});
+
+// Auto-pause when window loses focus
+window.addEventListener('blur', () => {
+    if (game.running && !game.paused) {
+        game.paused = true;
+    }
+});
+
 // Mouse tracking for aiming
 document.addEventListener('mousemove', (e) => {
     if (game.canvas) {

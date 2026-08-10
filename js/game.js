@@ -788,6 +788,12 @@ function gameLoop(timestamp) {
 
     const now = Date.now();
 
+    if (game.paused) {
+        drawPauseScreen();
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
     // Update player
     game.player.update(deltaTime);
 
@@ -876,5 +882,24 @@ function restartGame() {
 // ============================================
 // EVENT LISTENERS
 // ============================================
+/**
+ * Draw pause screen overlay
+ */
+function drawPauseScreen() {
+    const ctx = game.ctx;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
+
+    ctx.fillStyle = '#e94560';
+    ctx.font = 'bold 48px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('PAUSED', CONFIG.CANVAS_WIDTH / 2, CONFIG.CANVAS_HEIGHT / 2 - 20);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '20px "Courier New", monospace';
+    ctx.fillText('Press ESC to resume', CONFIG.CANVAS_WIDTH / 2, CONFIG.CANVAS_HEIGHT / 2 + 30);
+}
+
 document.getElementById('startBtn').addEventListener('click', initGame);
 document.getElementById('restartBtn').addEventListener('click', restartGame);
