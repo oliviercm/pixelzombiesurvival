@@ -26,7 +26,7 @@ const SoundEngine = {
             smg: 'sounds/mp5-fire.wav',
             shotgun: 'sounds/r870-fire.wav',
             sniper: 'sounds/barretm82-fire.wav',
-            m79: 'sounds/rpg-fire.wav',
+            m79: 'sounds/m79-fire.wav',
             law: 'sounds/law.wav',
             lightmg: 'sounds/m249-fire.wav',
             heavymg: 'sounds/gau17-fire.wav',
