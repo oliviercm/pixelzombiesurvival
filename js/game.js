@@ -532,7 +532,7 @@ function updateUI() {
     hud.innerHTML = `
         <div>HEALTH: ${Math.max(0, Math.floor(player.health))}/${player.maxHealth}</div>
         <div>WAVE: ${game.wave}</div>
-        <div>KILLS: ${game.kills}</div>
+        <div>ZOMBIES LEFT: ${game.zombiesToSpawn + game.zombies.length}</div>
     `;
 
     // Update weapon info
