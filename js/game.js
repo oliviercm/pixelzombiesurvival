@@ -627,9 +627,29 @@ function drawGame() {
         }
     });
 
-    // Draw crosshair - offset based on CURSOR_SIZE to center on actual cursor hotspot
+    // Draw aiming line from gun barrel to crosshair (fades near crosshair)
+    const playerScreenX = game.player.x - game.camera.x;
+    const playerScreenY = game.player.y - game.camera.y;
+    const gunTipX = playerScreenX + Math.cos(game.player.facing) * 25;
+    const gunTipY = playerScreenY + Math.sin(game.player.facing) * 25;
     const cx = game.mouseX - (CONFIG.CURSOR_SIZE / 2);
     const cy = game.mouseY - (CONFIG.CURSOR_SIZE / 2);
+    const maxAlpha = 0.1;
+    const segments = 30;
+    const dx = (cx - gunTipX) / segments;
+    const dy = (cy - gunTipY) / segments;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < segments; i++) {
+        const t = i / segments;
+        const alpha = maxAlpha * (1 - t); // 0 at crosshair, maxAlpha at gun
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(gunTipX + dx * i, gunTipY + dy * i);
+        ctx.lineTo(gunTipX + dx * (i + 1), gunTipY + dy * (i + 1));
+        ctx.stroke();
+    }
+
+    // Draw crosshair - offset based on CURSOR_SIZE to center on actual cursor hotspot
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1;
     ctx.beginPath();
