@@ -222,14 +222,6 @@ class Player {
         ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
         ctx.fillRect(screenX - 15, screenY - this.height/2 - 18, 30 * healthPercent, 4);
 
-        // Draw reload progress bar (below health bar)
-        const currentWeapon = this.weapons[this.weaponIndex];
-        if (currentWeapon.reloading) {
-            const reloadProgress = 1 - (currentWeapon.reloadTimer / currentWeapon.reloadTime);
-            ctx.fillStyle = '#333333';
-            ctx.fillRect(screenX - 15, screenY - this.height/2 - 13, 30, 3);
-            ctx.fillStyle = '#ffaa00';
-            ctx.fillRect(screenX - 15, screenY - this.height/2 - 13, 30 * reloadProgress, 3);
-        }
+
     }
 }

@@ -640,6 +640,33 @@ function drawGame() {
     ctx.moveTo(cx, cy - (CONFIG.CURSOR_SIZE * 2));
     ctx.lineTo(cx, cy + (CONFIG.CURSOR_SIZE * 2));
     ctx.stroke();
+
+    // Draw ammo / reload circle around crosshair
+    const currentWeapon = game.player.weapons[game.player.weaponIndex];
+    const circleRadius = CONFIG.CURSOR_SIZE * 2;
+    // Background circle (empty)
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, circleRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    if (currentWeapon.reloading) {
+        // Reload progress
+        const reloadRatio = 1 - (currentWeapon.reloadTimer / currentWeapon.reloadTime);
+        ctx.strokeStyle = '#ffaa00';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, circleRadius, -Math.PI / 2, -Math.PI / 2 + reloadRatio * Math.PI * 2);
+        ctx.stroke();
+    } else {
+        // Ammo clip fill
+        const clipRatio = currentWeapon.currentAmmo / currentWeapon.clipSize;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, circleRadius, -Math.PI / 2, -Math.PI / 2 + clipRatio * Math.PI * 2);
+        ctx.stroke();
+    }
 }
 
 /**
