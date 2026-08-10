@@ -5,7 +5,7 @@ const CONFIG = {
     CANVAS_WIDTH: 1200,
     CANVAS_HEIGHT: 800,
     TARGET_FPS: 60,
-    PLAYER_SPEED: 3,
+    PLAYER_SPEED: 2,
     PLAYER_SIZE: 20,
     PLAYER_HEALTH: 100,
     ZOMBIE_SIZE: 20,
@@ -16,13 +16,13 @@ const CONFIG = {
     INITIAL_ZOMBIE_COUNT: 10,
     ZOMBIE_SPAWN_INTERVAL: 3000,
     WAVE_DURATION: 60000,
-    ZOMBIES_PER_WAVE: 20,
-    MAX_ZOMBIES: 100,
+    INCREASED_ZOMBIES_PER_WAVE: 5,
+    MAX_ZOMBIES: 500,
     AMMO_PICKUP_PERCENT: 10,
     HEALTH_PICKUP_PERCENT: 15,
     CURSOR_SIZE: 8,
-    ZOMBIE_SPAWN_GROUP_MIN: 3,
-    ZOMBIE_SPAWN_GROUP_MAX: 5,
+    ZOMBIE_SPAWN_GROUP_MIN: 2,
+    ZOMBIE_SPAWN_GROUP_MAX: 4,
     BARRELS_PER_WAVE_MIN: 1,
     BARRELS_PER_WAVE_MAX: 3,
     BARREL_HEALTH_MIN: 30,
@@ -30,12 +30,12 @@ const CONFIG = {
     RELOAD_KEY: 'KeyR',
     NPC_HEALTH: 80,
     NPC_SIZE: 20,
-    NPC_SPEED: 2,
+    NPC_SPEED: 1.8,
     NPC_MOVE_INTERVAL: 3000,
     NPC_MIN_DISTANCE: 50,
     NPC_MAX_DISTANCE: 150,
     NPC_SPAWN_DISTANCE: 200,
-    MAX_NPCS: 0,
+    MAX_NPCS: 5,
 };
 
 // ============================================
@@ -46,7 +46,7 @@ const CONFIG = {
 const ZombieTypes = {
     normal: {
         name: 'Normal Zombie',
-        speed: 2,
+        speed: 1,
         health: 40,
         damage: 10,
         colors: {
@@ -61,7 +61,7 @@ const ZombieTypes = {
     },
     demon: {
         name: 'Demon Zombie',
-        speed: 2.5,
+        speed: 1.25,
         health: 60,
         damage: 25,
         colors: {
@@ -76,7 +76,7 @@ const ZombieTypes = {
     },
     fast: {
         name: 'Fast Zombie',
-        speed: 3,
+        speed: 1.5,
         health: 30,
         damage: 10,
         colors: {
@@ -91,7 +91,7 @@ const ZombieTypes = {
     },
     boomer: {
         name: 'Boomer Zombie',
-        speed: 1.5,
+        speed: 0.75,
         health: 50,
         damage: 15,
         size: 1.4,

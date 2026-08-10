@@ -60,7 +60,7 @@ function initGame() {
     game.kills = 0;
     game.wave = 1;
     game.zombiesInWave = 0;
-    game.zombiesToSpawn = CONFIG.INITIAL_ZOMBIE_COUNT;
+    game.zombiesToSpawn = CONFIG.INITIAL_ZOMBIE_COUNT + CONFIG.INCREASED_ZOMBIES_PER_WAVE * (game.wave - 1);
     game.lastZombieSpawn = Date.now();
     game.lastPickupSpawn = Date.now();
     game.running = true;
@@ -94,7 +94,7 @@ function initGame() {
  * Spawn a zombie at a random position near the player
  */
 function spawnZombie() {
-    if (game.zombies.length >= CONFIG.MAX_ZOMBIES) return;
+    if (game.zombies.length >= CONFIG.MAX_ZOMBIES) return false;
 
     // Spawn on a random edge of the arena
     const edge = Math.floor(Math.random() * 4);
@@ -136,6 +136,8 @@ function spawnZombie() {
     
     game.zombies.push(new Zombie(x, y, zombieType));
     game.zombiesInWave++;
+
+    return true;
 }
 
 /**
@@ -762,19 +764,25 @@ function gameLoop(timestamp) {
 
     // Spawn zombies in groups
     if (now - game.lastZombieSpawn > CONFIG.ZOMBIE_SPAWN_INTERVAL && game.zombiesToSpawn > 0) {
-        const groupSize = Math.floor(Math.random() * (CONFIG.ZOMBIE_SPAWN_GROUP_MAX - CONFIG.ZOMBIE_SPAWN_GROUP_MIN + 1)) + CONFIG.ZOMBIE_SPAWN_GROUP_MIN;
+        const zombieSpawnGroupMin = CONFIG.ZOMBIE_SPAWN_GROUP_MIN + game.wave - 1;
+        const zombieSpawnGroupMax = CONFIG.ZOMBIE_SPAWN_GROUP_MAX + game.wave - 1;
+        const groupSize = Math.floor(Math.random() * (zombieSpawnGroupMax - zombieSpawnGroupMin + 1)) + zombieSpawnGroupMin;
         const actualSpawn = Math.min(groupSize, game.zombiesToSpawn);
         for (let i = 0; i < actualSpawn; i++) {
-            spawnZombie();
+            const spawnedZombie = spawnZombie();
+            if (spawnedZombie) {
+                game.zombiesToSpawn -= 1;
+            } else {
+                break;
+            }
         }
-        game.zombiesToSpawn -= actualSpawn;
         game.lastZombieSpawn = now;
     }
 
     // Check if wave is complete
     if (game.zombiesToSpawn <= 0 && game.zombies.length === 0) {
         game.wave++;
-        game.zombiesToSpawn = CONFIG.ZOMBIES_PER_WAVE + (game.wave - 1) * 2;
+        game.zombiesToSpawn = CONFIG.INITIAL_ZOMBIE_COUNT + CONFIG.INCREASED_ZOMBIES_PER_WAVE * (game.wave - 1);
         CONFIG.ZOMBIE_SPAWN_INTERVAL = Math.max(1000, 3000 - game.wave * 100);
         spawnBarrels();
         spawnNPC();
