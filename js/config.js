@@ -35,7 +35,7 @@ const CONFIG = {
     NPC_MIN_DISTANCE: 50,
     NPC_MAX_DISTANCE: 150,
     NPC_SPAWN_DISTANCE: 200,
-    MAX_NPCS: 5,
+    MAX_NPCS: 0,
 };
 
 // ============================================
