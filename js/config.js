@@ -27,6 +27,7 @@ const CONFIG = {
     BARRELS_PER_WAVE_MAX: 3,
     BARREL_HEALTH_MIN: 30,
     BARREL_HEALTH_MAX: 50,
+    RELOAD_KEY: 'KeyR',
 };
 
 // ============================================
@@ -104,9 +105,10 @@ const ZombieTypes = {
 const WEAPONS = [
     {
         name: "Glock Pistol",
+        clipSize: 15,
         ammo: 120,
-        maxAmmo: 120,
         fireRate: 300,
+        reloadTime: 1500,
         bulletSpeed: 10,
         damage: 15,
         bulletCount: 1,
@@ -117,9 +119,10 @@ const WEAPONS = [
     },
     {
         name: "AK-47 Assault Rifle",
+        clipSize: 30,
         ammo: 300,
-        maxAmmo: 300,
         fireRate: 100,
+        reloadTime: 2500,
         bulletSpeed: 12,
         damage: 25,
         bulletCount: 1,
@@ -130,9 +133,10 @@ const WEAPONS = [
     },
     {
         name: "MP5 Submachine Gun",
+        clipSize: 30,
         ammo: 250,
-        maxAmmo: 250,
         fireRate: 70,
+        reloadTime: 2000,
         bulletSpeed: 11,
         damage: 18,
         bulletCount: 1,
@@ -143,9 +147,10 @@ const WEAPONS = [
     },
     {
         name: "Remington 870 Shotgun",
+        clipSize: 8,
         ammo: 80,
-        maxAmmo: 80,
         fireRate: 600,
+        reloadTime: 3000,
         bulletSpeed: 10,
         damage: 12,
         bulletCount: 8,
@@ -156,9 +161,10 @@ const WEAPONS = [
     },
     {
         name: "Barrett M82A1 Sniper",
+        clipSize: 10,
         ammo: 50,
-        maxAmmo: 50,
         fireRate: 1000,
+        reloadTime: 3500,
         bulletSpeed: 25,
         damage: 100,
         bulletCount: 1,
@@ -169,9 +175,10 @@ const WEAPONS = [
     },
     {
         name: "M79 Grenade Launcher",
+        clipSize: 1,
         ammo: 30,
-        maxAmmo: 30,
         fireRate: 1200,
+        reloadTime: 4000,
         bulletSpeed: 8,
         damage: 80,
         bulletCount: 1,
@@ -183,9 +190,10 @@ const WEAPONS = [
     },
     {
         name: "Mossberg 500 Shotgun",
+        clipSize: 5,
         ammo: 60,
-        maxAmmo: 60,
         fireRate: 800,
+        reloadTime: 3500,
         bulletSpeed: 10,
         damage: 15,
         bulletCount: 10,
@@ -196,9 +204,10 @@ const WEAPONS = [
     },
     {
         name: "M249 Light Machine Gun",
+        clipSize: 100,
         ammo: 400,
-        maxAmmo: 400,
         fireRate: 50,
+        reloadTime: 3000,
         bulletSpeed: 12,
         damage: 20,
         bulletCount: 1,
@@ -209,9 +218,10 @@ const WEAPONS = [
     },
     {
         name: "M72 LAW Rocket Launcher",
+        clipSize: 1,
         ammo: 10,
-        maxAmmo: 10,
         fireRate: 2400,
+        reloadTime: 4500,
         bulletSpeed: 7,
         damage: 150,
         bulletCount: 1,
@@ -223,9 +233,10 @@ const WEAPONS = [
     },
     {
         name: "GAU-17/A Machine Gun",
+        clipSize: 100,
         ammo: 500,
-        maxAmmo: 500,
         fireRate: 40,
+        reloadTime: 3500,
         bulletSpeed: 14,
         damage: 22,
         bulletCount: 1,

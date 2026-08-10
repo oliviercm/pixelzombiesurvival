@@ -516,9 +516,12 @@ function updateUI() {
 
     // Update weapon info
     const weaponInfo = document.getElementById('weaponInfo');
+    const isReloading = player.reloading;
+    const reloadProgress = isReloading ? Math.floor((1 - player.reloadTimer / weapon.reloadTime) * 100) : 0;
     let weaponListHTML = `
         <div style="color: ${weapon.color}; font-weight: bold;">${weapon.name}</div>
-        <div>AMMO: ${weapon.currentAmmo}/${weapon.maxAmmo}</div>
+        <div>AMMO: <span style="color:#fff;">${weapon.currentAmmo}</span>/<span style="color:#aaa;">${weapon.clipSize}</span>  <span style="color:#888;">| RESERVE: ${weapon.reserveAmmo}</span></div>
+        ${isReloading ? `<div style="color: #ffaa00; font-size: 12px;">RELOADING ${reloadProgress}%</div><div style="background:#333;width:120px;height:6px;margin:2px 0;"><div style="background:#ffaa00;width:${reloadProgress}%;height:100%;"></div></div>` : ''}
         <div style="font-size: 11px; color: #aaa;">${weapon.description}</div>
         <div style="font-size: 11px; color: #aaa;">DMG: ${weapon.damage} | RATE: ${1000/weapon.fireRate}/s</div>
         <div style="margin-top: 6px; font-size: 11px; color: #888;">— weapons —</div>

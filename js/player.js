@@ -14,10 +14,12 @@ class Player {
         this.health = CONFIG.PLAYER_HEALTH;
         this.maxHealth = CONFIG.PLAYER_HEALTH;
         this.weaponIndex = 0;
-        this.weapons = WEAPONS.map(w => ({...w, currentAmmo: w.ammo}));
+        this.weapons = WEAPONS.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo}));
         this.lastShot = 0;
         this.invincibleTimer = 0;
         this.facing = 0; // angle in radians
+        this.reloading = false;
+        this.reloadTimer = 0;
     }
 
     update(deltaTime) {
@@ -62,9 +64,29 @@ class Player {
             SoundEngine.playChangeWeapon();
         }
 
+        // Reload - press R
+        if (keys[CONFIG.RELOAD_KEY] && !this.reloading) {
+            keys[CONFIG.RELOAD_KEY] = false;
+            this.reload();
+        }
+
         // Shooting - respond to both spacebar and mouse click
-        if (keys['Space'] || game.mouseClick) {
+        if ((keys['Space'] || game.mouseClick) && !this.reloading) {
             this.shoot();
+        }
+
+        // Reload timer
+        if (this.reloading) {
+            this.reloadTimer -= deltaTime;
+            if (this.reloadTimer <= 0) {
+                this.reloadTimer = 0;
+                this.reloading = false;
+                const weapon = this.weapons[this.weaponIndex];
+                const needed = weapon.clipSize - weapon.currentAmmo;
+                const available = Math.min(needed, weapon.reserveAmmo);
+                weapon.currentAmmo += available;
+                weapon.reserveAmmo -= available;
+            }
         }
 
         // Invincibility timer
@@ -73,11 +95,19 @@ class Player {
         }
     }
 
+    reload() {
+        const weapon = this.weapons[this.weaponIndex];
+        if (weapon.currentAmmo >= weapon.clipSize) return; // clip already full
+        if (weapon.reserveAmmo <= 0) return; // no reserve ammo
+        this.reloading = true;
+        this.reloadTimer = weapon.reloadTime;
+    }
+
     shoot() {
         const weapon = this.weapons[this.weaponIndex];
         const now = Date.now();
 
-        // Check if weapon has ammo and cooldown is ready
+        // Check if weapon has clip ammo and cooldown is ready
         if (weapon.currentAmmo <= 0 || now - this.lastShot < weapon.fireRate) return;
 
         // Deduct ammo
@@ -186,5 +216,15 @@ class Player {
         ctx.fillRect(screenX - 15, screenY - this.height/2 - 18, 30, 4);
         ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
         ctx.fillRect(screenX - 15, screenY - this.height/2 - 18, 30 * healthPercent, 4);
+
+        // Draw reload progress bar (below health bar)
+        if (this.reloading) {
+            const weapon = this.weapons[this.weaponIndex];
+            const reloadProgress = 1 - (this.reloadTimer / weapon.reloadTime);
+            ctx.fillStyle = '#333333';
+            ctx.fillRect(screenX - 15, screenY - this.height/2 - 13, 30, 3);
+            ctx.fillStyle = '#ffaa00';
+            ctx.fillRect(screenX - 15, screenY - this.height/2 - 13, 30 * reloadProgress, 3);
+        }
     }
 }

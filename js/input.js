@@ -7,7 +7,7 @@ document.addEventListener('keydown', (e) => {
     keys[e.code] = true;
     
     // Prevent scrolling with game keys
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyR'].includes(e.code)) {
         e.preventDefault();
     }
 });
