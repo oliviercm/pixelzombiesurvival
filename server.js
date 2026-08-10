@@ -68,7 +68,7 @@ async function startServer() {
 
     const server = http.createServer((req, res) => {
         // Clean the path and resolve to ROOT
-        let filePath = path.join(ROOT, req.url === '/' ? 'zombie-game.html' : req.url);
+        let filePath = path.join(ROOT, req.url === '/' ? 'index.html' : req.url);
 
         // Prevent directory traversal
         if (!filePath.startsWith(ROOT)) {

@@ -1,15 +1,15 @@
 # Pixel Zombie Survival
 
-A single-file HTML5 canvas zombie survival game. Survive waves of zombies using 10 different weapons in a pixel-art styled arena.
+An HTML5 canvas zombie survival game. Survive waves of zombies using different weapons in a pixel-art styled arena.
 
 ## Features
 
-- **10 Weapons**: From Glock pistol to RPG launcher, each with unique stats
-- **4 Zombie Types**: Normal (gray), Demon (red, fast), Fast (yellow, swift), Boomer (green, explodes on death)
+- **Different Weapons**: From Glock pistol to RPG launcher, each with unique stats
+- **Different Zombie Types**: Normal (gray), Demon (red, fast), Fast (yellow, swift), Boomer (green, explodes on death)
 - **Wave System**: Escalating difficulty with more zombies per wave
 - **Pickup System**: Health (green) and ammo (yellow) powerups
 - **Particle Effects**: Blood splatter, muzzle flash, explosions
-- **Synthesized Audio**: Gunshots, impacts, damage sounds (no external assets)
+- **Audio**: Gunshots, impacts, damage sounds
 - **Pixel Art Style**: Crisp-edged rendering with grid background
 
 ## Controls
@@ -23,38 +23,15 @@ A single-file HTML5 canvas zombie survival game. Survive waves of zombies using 
 
 ## Getting Started
 
-Simply open `zombie-game.html` in any modern web browser. No build step or server required.
+Run `npm start` to run the server, or use your own to serve the game files.
 
-## Project Structure
 
-```
-zomb/
-├── zombie-game.html    # Complete game (HTML + CSS + JS)
-├── ARCHITECTURE.md     # System architecture documentation
-├── CODE_STYLE.md       # Coding conventions and patterns
-├── README.md           # This file
-├── LICENSE             # MIT license
-└── .gitignore          # Git ignore rules
-```
-
-## Configuration
-
-Tweak game balance by editing the `CONFIG` object near the top of `zombie-game.html`:
-
-- `PLAYER_SPEED` - Movement speed
-- `ZOMBIE_SPAWN_INTERVAL` - How often zombies spawn
-- `WAVE_DURATION` - Time before next wave (unused in current loop)
-- `MAX_ZOMBIES` - Maximum concurrent zombies
-
-Add new zombie types by adding entries to the `ZombieTypes` object.
-Add new weapons by adding entries to the `WEAPONS` array.
 
 ## Tech
 
 - HTML5 Canvas 2D
 - Vanilla JavaScript (ES6+ classes)
 - Web Audio API
-- Zero dependencies
 
 ## License
 
