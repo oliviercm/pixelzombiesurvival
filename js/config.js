@@ -48,7 +48,7 @@ const ZombieTypes = {
         name: 'Normal Zombie',
         speed: 1,
         health: 40,
-        damage: 10,
+        damage: 20,
         colors: {
             body: '#888888',
             head: '#777777',
@@ -78,7 +78,7 @@ const ZombieTypes = {
         name: 'Fast Zombie',
         speed: 1.5,
         health: 30,
-        damage: 10,
+        damage: 15,
         colors: {
             body: '#ffff00',
             head: '#ffdd00',
