@@ -822,6 +822,7 @@ function gameLoop(timestamp) {
 
     if (game.paused) {
         game.deltaTime = 0;
+        drawGame();
         drawPauseScreen();
         requestAnimationFrame(gameLoop);
         return;
