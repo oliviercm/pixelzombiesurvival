@@ -37,6 +37,7 @@ class FightingCharacter {
                         currentWeapon.reloadTimer = currentWeapon.reloadTime;
                         SoundEngine.playReload(currentWeapon.sound + '-reload');
                     } else {
+                        SoundEngine.playReload(currentWeapon.sound + '-reload');
                         currentWeapon.reloading = false;
                     }
                 } else {
@@ -44,6 +45,9 @@ class FightingCharacter {
                     const available = Math.min(needed, currentWeapon.reserveAmmo);
                     currentWeapon.currentAmmo += available;
                     currentWeapon.reserveAmmo -= available;
+                    if (currentWeapon.reloadSoundAtEnd) {
+                        SoundEngine.playReload(currentWeapon.sound + '-reload');
+                    }
                     currentWeapon.reloading = false;
                 }
             }
@@ -152,7 +156,9 @@ class FightingCharacter {
         weapon.reloadShellCount = 0;
         weapon.reloadTimer = weapon.reloadTimeFirstShell || weapon.reloadTime;
         weapon.reloadOffset = 0;
-        SoundEngine.playReload(weapon.sound + '-reload');
+        if (!weapon.reloadSoundAtEnd) {
+            SoundEngine.playReload(weapon.sound + '-reload');
+        }
     }
 
     takeDamage(amount) {

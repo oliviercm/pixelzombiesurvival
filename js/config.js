@@ -208,6 +208,7 @@ const WEAPONS = [
         description: "Classic zombie killer",
         reloadOneAtATime: true,
         reloadTimeFirstShell: 900,
+        reloadSoundAtEnd: true,
         shake: 5.0
     },
     {

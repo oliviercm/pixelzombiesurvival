@@ -109,7 +109,9 @@ class Player extends FightingCharacter {
         weapon.reloadShellCount = 0;
         weapon.reloadTimer = weapon.reloadTimeFirstShell || weapon.reloadTime;
         weapon.reloadOffset = 0;
-        SoundEngine.playReload(weapon.sound + '-reload');
+        if (!weapon.reloadSoundAtEnd) {
+            SoundEngine.playReload(weapon.sound + '-reload');
+        }
     }
 
     shoot() {
