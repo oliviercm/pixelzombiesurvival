@@ -129,11 +129,11 @@ class Player extends FightingCharacter {
         }
 
         // Check if cooldown is ready
-        if (now - this.lastShot < weapon.fireRate) return;
+        if (now - weapon.lastShot < weapon.fireRate) return;
 
         // Deduct ammo
         weapon.currentAmmo--;
-        this.lastShot = now;
+        weapon.lastShot = now;
 
         // Play weapon-specific shoot sound
         SoundEngine.playShoot(weapon.sound);

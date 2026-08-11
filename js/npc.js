@@ -14,8 +14,7 @@ class FightingCharacter {
         this.health = health;
         this.maxHealth = maxHealth;
         this.weaponIndex = 0;
-        this.weapons = weaponConfigs.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0, reloadOneAtATime: w.reloadOneAtATime}));
-        this.lastShot = 0;
+        this.weapons = weaponConfigs.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0, reloadOneAtATime: w.reloadOneAtATime, lastShot: 0}));
         this.invincibleTimer = 0;
         this.facing = 0;
         this.onDeath = null;
@@ -73,11 +72,11 @@ class FightingCharacter {
         }
 
         // Check if cooldown is ready
-        if (now - this.lastShot < weapon.fireRate) return;
+        if (now - weapon.lastShot < weapon.fireRate) return;
 
         // Deduct ammo
         weapon.currentAmmo--;
-        this.lastShot = now;
+        weapon.lastShot = now;
 
         // Play weapon-specific shoot sound
         SoundEngine.playShoot(weapon.sound);
