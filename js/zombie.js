@@ -89,10 +89,10 @@ class Zombie {
             game.particles.push({
                 x: this.x,
                 y: this.y,
-                vx: (Math.random() - 0.5) * 3,
-                vy: (Math.random() - 0.5) * 3,
-                life: 200,
-                maxLife: 200,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                life: 500,
+                maxLife: 500,
                 color: this.colors.hitParticle,
                 size: 2
             });
@@ -104,12 +104,12 @@ class Zombie {
                 game.particles.push({
                     x: this.x,
                     y: this.y,
-                    vx: (Math.random() - 0.5) * 5,
-                    vy: (Math.random() - 0.5) * 5,
-                    life: 500,
-                    maxLife: 500,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    life: 1000,
+                    maxLife: 1000,
                     color: this.colors.deathParticle,
-                    size: 3
+                    size: Math.random() < 0.5 ? 3 : 4,
                 });
             }
             

@@ -69,7 +69,7 @@ const ZombieTypes = {
             head: '#aa0000',
             eyes: '#ffffff',
             healthBar: '#ff0000',
-            hitParticle: '#ff0000',
+            hitParticle: '#cc0000',
             deathParticle: '#aa0000'
         },
         spawnWeight: 15
@@ -116,7 +116,7 @@ const ZombieTypes = {
             head: '#634d23',
             eyes: '#ff0000',
             healthBar: '#ff0000',
-            hitParticle: '#aa4444',
+            hitParticle: '#aa6d44',
             deathParticle: '#632323'
         },
         spawnWeight: 1
