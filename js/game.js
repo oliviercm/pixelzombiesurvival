@@ -396,6 +396,10 @@ function updateBullets(deltaTime) {
                     barrel.takeDamage(bullet.damage);
                     spawnDamageNumber(barrel.x, barrel.y, bullet.damage, '#ffaa00');
                     SoundEngine.playBarrelHit();
+                    if (bullet.explosionRadius > 0) {
+                        createExplosion(bullet.x, bullet.y, bullet.explosionRadius, bullet.damage);
+                        SoundEngine.playExplosion(bullet.explosionRadius);
+                    }
                     break;
                 }
             }
