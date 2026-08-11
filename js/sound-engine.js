@@ -50,6 +50,13 @@ const SoundEngine = {
             zombiedeath: 'sounds/zombiedeath.wav',
             playerhit: 'sounds/playerhit.wav',
             playerdeath: 'sounds/playerdeath.wav',
+            ric1: 'sounds/ric1.wav',
+            ric2: 'sounds/ric2.wav',
+            ric3: 'sounds/ric3.wav',
+            ric4: 'sounds/ric4.wav',
+            ric5: 'sounds/ric5.wav',
+            ric6: 'sounds/ric6.wav',
+            ric7: 'sounds/ric7.wav',
             barrelExplosion: 'sounds/barrel-explosion.wav',
             rocketExplosion: 'sounds/rocket-explosion.wav',
             pickupammo: 'sounds/pickupammo.wav',
@@ -115,6 +122,16 @@ const SoundEngine = {
     // Zombie hit sound - randomized among three variants
     playHit(weaponType = 'rifle') {
         const variants = ['zombiehit', 'zombiehit2', 'zombiehit3'];
+        const variant = variants[Math.floor(Math.random() * variants.length)];
+        const buffer = this.sounds[variant];
+        if (buffer) {
+            this.playBuffer(buffer, 1.0);
+        }
+    },
+
+    // Barrel hit sound - randomized among 7 variants
+    playBarrelHit() {
+        const variants = ['ric1', 'ric2', 'ric3', 'ric4', 'ric5', 'ric6', 'ric7'];
         const variant = variants[Math.floor(Math.random() * variants.length)];
         const buffer = this.sounds[variant];
         if (buffer) {

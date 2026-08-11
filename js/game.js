@@ -296,7 +296,7 @@ function updateBullets(deltaTime) {
                 if (dist < bullet.size + Math.max(barrel.width, barrel.height) / 2) {
                     barrelHit = true;
                     barrel.takeDamage(bullet.damage);
-                    SoundEngine.playHit(bullet.sound);
+                    SoundEngine.playBarrelHit();
                     break;
                 }
             }
