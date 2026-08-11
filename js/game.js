@@ -299,7 +299,8 @@ function createExplosion(x, y, radius, damage) {
         life: 300,
         maxLife: 300,
         damage: damage,
-        startTime: game.time
+        startTime: game.time,
+        damagedZombies: new Set()
     });
 
     // Create explosion particles
@@ -360,7 +361,8 @@ function createBoomerExplosion(x, y) {
         damage: explosionDamage,
         startTime: game.time,
         isBoomer: true,
-        color: '#44ff44'
+        color: '#44ff44',
+        damagedZombies: new Set()
     });
 
     // Create green explosion particles
@@ -399,7 +401,7 @@ function updateExplosions(deltaTime) {
             SoundEngine.playExplosion(explosion.maxRadius);
         }
 
-        // Apply damage to nearby zombies
+        // Apply damage to nearby zombies (once per zombie per explosion)
         if (explosion.radius > 0) {
             for (let j = game.zombies.length - 1; j >= 0; j--) {
                 const zombie = game.zombies[j];
@@ -407,7 +409,8 @@ function updateExplosions(deltaTime) {
                 const dy = explosion.y - zombie.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < explosion.radius + zombie.width / 2) {
+                if (dist < explosion.radius + zombie.width / 2 && !explosion.damagedZombies.has(zombie)) {
+                    explosion.damagedZombies.add(zombie);
                     const killed = zombie.takeDamage(explosion.damage);
                     if (killed) {
                         game.zombies.splice(j, 1);

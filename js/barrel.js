@@ -13,7 +13,7 @@ class Barrel {
         this.isExploding = false;
         this.explosionTimer = 0;
         this.explosionRadius = 120;
-        this.explosionDamage = 25;
+        this.explosionDamage = 50;
     }
 
     update(deltaTime) {
