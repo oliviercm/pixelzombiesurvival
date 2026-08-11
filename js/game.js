@@ -771,14 +771,14 @@ function drawGame() {
     ctx.fillText(healthText, cx - ammoOffset, cy);
 
     // Draw ammo count to the right of the crosshair
-    const ammoText = `${currentWeapon.currentAmmo}/${currentWeapon.clipSize}`;
+    const ammoText = `${currentWeapon.currentAmmo}`;
     ctx.textAlign = 'left';
     ctx.fillText(ammoText, cx + ammoOffset, cy);
 
     // Draw reserve ammo below the clip display
     ctx.font = '12px "Courier New", monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fillText(currentWeapon.reserveAmmo, cx + ammoOffset + 2, cy + 12);
+    ctx.fillText(currentWeapon.reserveAmmo, cx + ammoOffset, cy + 12);
 
     // Draw ammo / reload circle around crosshair
     const circleRadius = CONFIG.CURSOR_SIZE * 2;
