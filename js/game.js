@@ -351,6 +351,8 @@ function createExplosion(x, y, radius, damage) {
             size: Math.random() * 4 + 2
         });
     }
+
+    triggerShake(damage);
 }
 
 /**
@@ -416,6 +418,8 @@ function createBoomerExplosion(x, y) {
     
     // Play explosion sound
     SoundEngine.playExplosion(explosionRadius);
+
+    triggerShake(explosionDamage);
 }
 
 /**
