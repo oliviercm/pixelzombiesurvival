@@ -137,7 +137,7 @@ const SHELL_TYPES = {
     r870:     { width: 3, height: 5,  color: '#ff4444' },
     aa12: { width: 4, height: 6,  color: '#ff4444' },
     m79:      { width: 5, height: 5,  color: '#b8860b' },
-    law:      { width: 15, height: 6, color: '#00570c' }
+    law:      { width: 20, height: 6, color: '#00570c' }
 };
 
 // ============================================
