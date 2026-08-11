@@ -726,10 +726,10 @@ function drawGame() {
     ctx.stroke();
 
     const currentWeapon = game.player.weapons[game.player.weaponIndex];
-    const ammoOffset = CONFIG.CURSOR_SIZE * 2.8;
+    const ammoOffset = CONFIG.CURSOR_SIZE * 3;
 
     ctx.font = 'bold 14px "Courier New", monospace';
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.textBaseline = 'middle';
 
     // Draw health to the left of the crosshair
@@ -741,6 +741,11 @@ function drawGame() {
     const ammoText = `${currentWeapon.currentAmmo}/${currentWeapon.clipSize}`;
     ctx.textAlign = 'left';
     ctx.fillText(ammoText, cx + ammoOffset, cy);
+
+    // Draw reserve ammo below the clip display
+    ctx.font = '12px "Courier New", monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText(currentWeapon.reserveAmmo, cx + ammoOffset + 2, cy + 12);
 
     // Draw ammo / reload circle around crosshair
     const circleRadius = CONFIG.CURSOR_SIZE * 2;
