@@ -630,10 +630,12 @@ function drawGame() {
     const ctx = game.ctx;
 
     // Apply screen shake offset
-    const shakeX = (Math.random() - 0.5) * 2 * Math.min(game.shake.intensity, 8);
-    const shakeY = (Math.random() - 0.5) * 2 * Math.min(game.shake.intensity, 8);
-    game.camera.x += shakeX;
-    game.camera.y += shakeY;
+    if (!game.paused) {
+        const shakeX = (Math.random() - 0.5) * 2 * Math.min(game.shake.intensity, 8);
+        const shakeY = (Math.random() - 0.5) * 2 * Math.min(game.shake.intensity, 8);
+        game.camera.x += shakeX;
+        game.camera.y += shakeY;
+    }
 
     // Clear and draw background
     drawBackground();
