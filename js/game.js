@@ -120,15 +120,16 @@ function spawnZombie() {
             break;
     }
 
-    // Determine zombie type using weighted random selection from ZombieTypes config
+    // Determine zombie type using integer weight selection from ZombieTypes config
     const zombieTypeNames = Object.keys(ZombieTypes);
-    const rand = Math.random();
-    let cumulativeChance = 0;
+    const totalWeight = zombieTypeNames.reduce((sum, t) => sum + ZombieTypes[t].spawnWeight, 0);
+    const rand = Math.random() * totalWeight;
+    let cumulativeWeight = 0;
     let zombieType = 'normal';
-    
+
     for (const type of zombieTypeNames) {
-        cumulativeChance += ZombieTypes[type].spawnChance;
-        if (rand < cumulativeChance) {
+        cumulativeWeight += ZombieTypes[type].spawnWeight;
+        if (rand < cumulativeWeight) {
             zombieType = type;
             break;
         }

@@ -57,7 +57,7 @@ const ZombieTypes = {
             hitParticle: '#888888',
             deathParticle: '#666666'
         },
-        spawnChance: 0.50
+        spawnWeight: 10
     },
     demon: {
         name: 'Demon Zombie',
@@ -72,7 +72,7 @@ const ZombieTypes = {
             hitParticle: '#ff0000',
             deathParticle: '#aa0000'
         },
-        spawnChance: 0.20
+        spawnWeight: 3
     },
     fast: {
         name: 'Fast Zombie',
@@ -87,7 +87,7 @@ const ZombieTypes = {
             hitParticle: '#ffff00',
             deathParticle: '#ffdd00'
         },
-        spawnChance: 0.15
+        spawnWeight: 3
     },
     boomer: {
         name: 'Boomer Zombie',
@@ -103,7 +103,7 @@ const ZombieTypes = {
             hitParticle: '#44aa44',
             deathParticle: '#66cc66'
         },
-        spawnChance: 0.15
+        spawnWeight: 2
     }
 };
 
