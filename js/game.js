@@ -100,7 +100,7 @@ function spawnZombie() {
 
     // Spawn on a random edge of the arena
     const edge = Math.floor(Math.random() * 4);
-    const padding = 5;
+    const padding = 20;
     let x, y;
 
     switch (edge) {
@@ -110,14 +110,14 @@ function spawnZombie() {
             break;
         case 1: // bottom edge
             x = Math.random() * (game.worldWidth + padding * 2) - padding;
-            y = game.worldHeight - padding;
+            y = game.worldHeight + padding;
             break;
         case 2: // left edge
             x = 0 - padding;
             y = Math.random() * (game.worldHeight + padding * 2) - padding;
             break;
         case 3: // right edge
-            x = game.worldWidth - padding;
+            x = game.worldWidth + padding;
             y = Math.random() * (game.worldHeight + padding * 2) - padding;
             break;
     }
