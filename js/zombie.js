@@ -65,8 +65,9 @@ class Zombie {
             this.y = closestTarget.y - ny * minDist;
         }
 
-        // Attack target if close enough
-        if (distance < 25) {
+        // Attack target if touching
+        const attackRange = 1 + this.width / 2 + CONFIG.PLAYER_SIZE / 2;
+        if (distance <= attackRange) {
             if (game.time - this.lastAttack > this.attackCooldown) {
                 if (closestTarget.takeDamage(this.damage)) {
                     this.lastAttack = game.time;
