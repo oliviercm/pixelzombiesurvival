@@ -162,6 +162,9 @@ class FightingCharacter {
         // Play damage sound
         SoundEngine.playDamage();
 
+        // Show damage number
+        spawnDamageNumber(this.x, this.y, amount, '#ff8888');
+
         // Create damage particles
         for (let i = 0; i < 5; i++) {
             game.particles.push({

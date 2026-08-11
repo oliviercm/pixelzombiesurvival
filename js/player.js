@@ -213,6 +213,9 @@ class Player extends FightingCharacter {
         // Play damage sound
         SoundEngine.playDamage();
 
+        // Show damage number
+        spawnDamageNumber(this.x, this.y, amount, '#ff0000');
+
         // Create damage particles
         for (let i = 0; i < 5; i++) {
             game.particles.push({

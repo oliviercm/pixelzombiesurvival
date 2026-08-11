@@ -13,6 +13,7 @@ let game = {
     pickups: [],
     particles: [],
     explosions: [],
+    damageNumbers: [],
     barrels: [],
     kills: 0,
     wave: 1,
@@ -55,6 +56,7 @@ function initGame() {
     game.zombies = [];
     game.pickups = [];
     game.particles = [];
+    game.damageNumbers = [];
     game.explosions = [];
     game.barrels = [];
     spawnBarrels();
@@ -187,6 +189,86 @@ function triggerShake(intensity) {
     game.shake.intensity = game.shake.intensity + intensity;
 }
 
+/**
+ * Spawn a juicy damage number at the given position
+ */
+function spawnDamageNumber(x, y, amount, color) {
+    game.damageNumbers.push({
+        x: x + (Math.random() - 0.5) * 16,
+        y: y - 10,
+        amount: amount,
+        color: color || '#ffffff',
+        life: 800,
+        maxLife: 800,
+        vy: -1.5 - Math.random() * 0.8,
+        vx: (Math.random() - 0.5) * 1.2,
+        scale: 0.1,
+        rotation: (Math.random() - 0.5) * 0.3,
+        popped: false
+    });
+}
+
+/**
+ * Update damage numbers
+ */
+function updateDamageNumbers(deltaTime) {
+    const timeScale = deltaTime / 16.67;
+    for (let i = game.damageNumbers.length - 1; i >= 0; i--) {
+        const dn = game.damageNumbers[i];
+        dn.life -= deltaTime;
+
+        // Pop-in effect: quickly scale up, then ease out
+        if (!dn.popped) {
+            dn.scale += (1 - dn.scale) * 0.35 * timeScale;
+            if (dn.scale > 0.95) dn.popped = true;
+        } else {
+            dn.scale += (1 - dn.scale) * 0.04 * timeScale;
+        }
+
+        dn.x += dn.vx * timeScale;
+        dn.y += dn.vy * timeScale;
+        dn.vy *= 0.98; // slight air resistance
+
+        if (dn.life <= 0) {
+            game.damageNumbers.splice(i, 1);
+        }
+    }
+}
+
+/**
+ * Draw damage numbers on top of everything
+ */
+function drawDamageNumbers() {
+    const ctx = game.ctx;
+    game.damageNumbers.forEach(dn => {
+        const screenX = dn.x - game.camera.x;
+        const screenY = dn.y - game.camera.y;
+        const lifeRatio = dn.life / dn.maxLife;
+
+        // Fade in quickly, then fade out
+        const alpha = lifeRatio < 0.3 ? lifeRatio / 0.3 : lifeRatio;
+        const size = 16 * dn.scale;
+
+        ctx.save();
+        ctx.translate(screenX, screenY);
+        ctx.rotate(dn.rotation);
+        ctx.globalAlpha = Math.max(0, alpha);
+        ctx.font = `bold ${Math.floor(size)}px "Courier New", monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Shadow for readability
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillText(dn.amount, 1, 1);
+
+        // Main text
+        ctx.fillStyle = dn.color;
+        ctx.fillText(dn.amount, 0, 0);
+        ctx.restore();
+    });
+    ctx.globalAlpha = 1;
+}
+
 function updateShake() {
     if (game.shake.intensity > 0.1) {
         game.shake.intensity *= game.shake.decay;
@@ -274,6 +356,9 @@ function updateBullets(deltaTime) {
                 hit = true;
                 const killed = zombie.takeDamage(bullet.damage);
 
+                // Show damage number
+                spawnDamageNumber(bullet.x, bullet.y, bullet.damage, '#ff4444');
+
                 // Play meaty hit sound with weapon context
                 SoundEngine.playHit(bullet.sound);
 
@@ -309,6 +394,7 @@ function updateBullets(deltaTime) {
                 if (dist < bullet.size + Math.max(barrel.width, barrel.height) / 2) {
                     barrelHit = true;
                     barrel.takeDamage(bullet.damage);
+                    spawnDamageNumber(barrel.x, barrel.y, bullet.damage, '#ffaa00');
                     SoundEngine.playBarrelHit();
                     break;
                 }
@@ -450,6 +536,7 @@ function updateExplosions(deltaTime) {
                 if (dist < explosion.radius + zombie.width / 2 && !explosion.damagedZombies.has(zombie)) {
                     explosion.damagedZombies.add(zombie);
                     const killed = zombie.takeDamage(explosion.damage);
+                    spawnDamageNumber(zombie.x, zombie.y, explosion.damage, '#ff8800');
                     if (killed) {
                         game.zombies.splice(j, 1);
                     }
@@ -478,6 +565,7 @@ function updateExplosions(deltaTime) {
 
                 if (dist < explosion.radius + Math.max(barrel.width, barrel.height) / 2) {
                     barrel.takeDamage(explosion.damage);
+                    spawnDamageNumber(barrel.x, barrel.y, explosion.damage, '#ff8800');
                 }
             }
         }
@@ -729,6 +817,9 @@ function drawGame() {
         }
     });
 
+    // Draw damage numbers (on top of everything)
+    drawDamageNumbers();
+
     // Draw explosions
     game.explosions.forEach(explosion => {
         const screenX = explosion.x - game.camera.x;
@@ -911,6 +1002,7 @@ function gameLoop(timestamp) {
     updateBullets(deltaTime);
     updateExplosions(deltaTime);
     updateParticles(deltaTime);
+    updateDamageNumbers(deltaTime);
     updatePickups(deltaTime);
 
     // Update barrels
