@@ -56,7 +56,6 @@ class FightingCharacter {
 
     shoot() {
         const weapon = this.weapons[this.weaponIndex];
-        const now = Date.now();
 
         // If reloading one-at-a-time and there's a shell in the clip, cancel reload and fire
         if (weapon.reloading && weapon.reloadOneAtATime && weapon.currentAmmo > 0) {
@@ -72,11 +71,11 @@ class FightingCharacter {
         }
 
         // Check if cooldown is ready
-        if (now - weapon.lastShot < weapon.fireRate) return;
+        if (game.time - weapon.lastShot < weapon.fireRate) return;
 
         // Deduct ammo
         weapon.currentAmmo--;
-        weapon.lastShot = now;
+        weapon.lastShot = game.time;
 
         // Play weapon-specific shoot sound
         SoundEngine.playShoot(weapon.sound);

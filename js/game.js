@@ -61,8 +61,8 @@ function initGame() {
     game.wave = 1;
     game.zombiesInWave = 0;
     game.zombiesToSpawn = CONFIG.INITIAL_ZOMBIE_COUNT + CONFIG.INCREASED_ZOMBIES_PER_WAVE * (game.wave - 1);
-    game.lastZombieSpawn = Date.now();
-    game.lastPickupSpawn = Date.now();
+    game.lastZombieSpawn = game.time;
+    game.lastPickupSpawn = game.time;
     game.running = true;
     game.paused = false;
 
@@ -819,6 +819,14 @@ function gameLoop(timestamp) {
 
     let deltaTime = timestamp - game.lastFrameTime;
     game.lastFrameTime = timestamp;
+
+    if (game.paused) {
+        game.deltaTime = 0;
+        drawPauseScreen();
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
     game.deltaTime = deltaTime;
     game.time += deltaTime;
 
@@ -826,14 +834,6 @@ function gameLoop(timestamp) {
     if (deltaTime > 100) {
         deltaTime = 100;
         game.time -= 100;
-    }
-
-    const now = Date.now();
-
-    if (game.paused) {
-        drawPauseScreen();
-        requestAnimationFrame(gameLoop);
-        return;
     }
 
     // Update player
@@ -846,7 +846,7 @@ function gameLoop(timestamp) {
     updateCamera();
 
     // Spawn zombies in groups
-    if (now - game.lastZombieSpawn > CONFIG.ZOMBIE_SPAWN_INTERVAL && game.zombiesToSpawn > 0) {
+    if (game.time - game.lastZombieSpawn > CONFIG.ZOMBIE_SPAWN_INTERVAL && game.zombiesToSpawn > 0) {
         const zombieSpawnGroupMin = CONFIG.ZOMBIE_SPAWN_GROUP_MIN + game.wave - 1;
         const zombieSpawnGroupMax = CONFIG.ZOMBIE_SPAWN_GROUP_MAX + game.wave - 1;
         const groupSize = Math.floor(Math.random() * (zombieSpawnGroupMax - zombieSpawnGroupMin + 1)) + zombieSpawnGroupMin;
@@ -859,7 +859,7 @@ function gameLoop(timestamp) {
                 break;
             }
         }
-        game.lastZombieSpawn = now;
+        game.lastZombieSpawn = game.time;
     }
 
     // Check if wave is complete
@@ -872,9 +872,9 @@ function gameLoop(timestamp) {
     }
 
     // Spawn pickups
-    if (now - game.lastPickupSpawn > CONFIG.PICKUP_SPAWN_INTERVAL) {
+    if (game.time - game.lastPickupSpawn > CONFIG.PICKUP_SPAWN_INTERVAL) {
         spawnPickup();
-        game.lastPickupSpawn = now;
+        game.lastPickupSpawn = game.time;
     }
 
     // Update entities with deltaTime

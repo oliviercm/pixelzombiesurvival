@@ -67,10 +67,9 @@ class Zombie {
 
         // Attack target if close enough
         if (distance < 25) {
-            const now = Date.now();
-            if (now - this.lastAttack > this.attackCooldown) {
+            if (game.time - this.lastAttack > this.attackCooldown) {
                 if (closestTarget.takeDamage(this.damage)) {
-                    this.lastAttack = now;
+                    this.lastAttack = game.time;
                 }
             }
         }
