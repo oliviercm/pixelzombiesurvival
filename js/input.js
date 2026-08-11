@@ -20,6 +20,7 @@ document.addEventListener('keyup', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Escape' && game.running) {
         game.paused = !game.paused;
+        game.canvas.style.cursor = game.paused ? 'default' : 'none';
         e.preventDefault();
     }
 });
@@ -28,6 +29,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('blur', () => {
     if (game.running && !game.paused) {
         game.paused = true;
+        game.canvas.style.cursor = 'default';
     }
 });
 

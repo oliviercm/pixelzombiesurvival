@@ -65,6 +65,7 @@ function initGame() {
     game.lastPickupSpawn = game.time;
     game.running = true;
     game.paused = false;
+    game.canvas.style.cursor = 'none';
 
     // Hide screens
     document.getElementById('instructionsScreen').style.display = 'none';
@@ -723,87 +724,89 @@ function drawGame() {
     });
     ctx.globalAlpha = 1;
 
-    // Draw aiming line from gun barrel to crosshair (fades near crosshair)
-    const playerScreenX = game.player.x - game.camera.x;
-    const playerScreenY = game.player.y - game.camera.y;
-    const gunTipX = playerScreenX + Math.cos(game.player.facing) * 25;
-    const gunTipY = playerScreenY + Math.sin(game.player.facing) * 25;
-    const cx = game.mouseX - (CONFIG.CURSOR_SIZE / 2);
-    const cy = game.mouseY - (CONFIG.CURSOR_SIZE / 2);
-    const maxAlpha = 0.1;
-    const segments = 30;
-    const dx = (cx - gunTipX) / segments;
-    const dy = (cy - gunTipY) / segments;
-    ctx.lineWidth = 1;
-    for (let i = 0; i < segments; i++) {
-        const t = i / segments;
-        const alpha = maxAlpha * (1 - t); // 0 at crosshair, maxAlpha at gun
-        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.beginPath();
-        ctx.moveTo(gunTipX + dx * i, gunTipY + dy * i);
-        ctx.lineTo(gunTipX + dx * (i + 1), gunTipY + dy * (i + 1));
-        ctx.stroke();
-    }
+    if (!game.paused) {
+        // Draw aiming line from gun barrel to crosshair (fades near crosshair)
+        const playerScreenX = game.player.x - game.camera.x;
+        const playerScreenY = game.player.y - game.camera.y;
+        const gunTipX = playerScreenX + Math.cos(game.player.facing) * 25;
+        const gunTipY = playerScreenY + Math.sin(game.player.facing) * 25;
+        const cx = game.mouseX - (CONFIG.CURSOR_SIZE / 2);
+        const cy = game.mouseY - (CONFIG.CURSOR_SIZE / 2);
+        const maxAlpha = 0.1;
+        const segments = 30;
+        const dx = (cx - gunTipX) / segments;
+        const dy = (cy - gunTipY) / segments;
+        ctx.lineWidth = 1;
+        for (let i = 0; i < segments; i++) {
+            const t = i / segments;
+            const alpha = maxAlpha * (1 - t); // 0 at crosshair, maxAlpha at gun
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(gunTipX + dx * i, gunTipY + dy * i);
+            ctx.lineTo(gunTipX + dx * (i + 1), gunTipY + dy * (i + 1));
+            ctx.stroke();
+        }
 
-    // Draw crosshair - offset based on CURSOR_SIZE to center on actual cursor hotspot
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(cx, cy, (CONFIG.CURSOR_SIZE * 1.5), 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx - (CONFIG.CURSOR_SIZE * 2), cy);
-    ctx.lineTo(cx + (CONFIG.CURSOR_SIZE * 2), cy);
-    ctx.moveTo(cx, cy - (CONFIG.CURSOR_SIZE * 2));
-    ctx.lineTo(cx, cy + (CONFIG.CURSOR_SIZE * 2));
-    ctx.stroke();
-
-    const currentWeapon = game.player.weapons[game.player.weaponIndex];
-    const ammoOffset = CONFIG.CURSOR_SIZE * 3;
-
-    ctx.font = 'bold 14px "Courier New", monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.textBaseline = 'middle';
-
-    // Draw health to the left of the crosshair
-    const healthText = `${Math.max(0, Math.floor(game.player.health))}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(healthText, cx - ammoOffset, cy);
-
-    // Draw ammo count to the right of the crosshair
-    const ammoText = `${currentWeapon.currentAmmo}`;
-    ctx.textAlign = 'left';
-    ctx.fillText(ammoText, cx + ammoOffset, cy);
-
-    // Draw reserve ammo below the clip display
-    ctx.font = '12px "Courier New", monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fillText(currentWeapon.reserveAmmo, cx + ammoOffset, cy + 12);
-
-    // Draw ammo / reload circle around crosshair
-    const circleRadius = CONFIG.CURSOR_SIZE * 2;
-    // Background circle (empty)
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(cx, cy, circleRadius, 0, Math.PI * 2);
-    ctx.stroke();
-    if (currentWeapon.reloading) {
-        // Reload progress
-        const reloadRatio = 1 - (currentWeapon.reloadTimer / currentWeapon.reloadTime);
-        ctx.strokeStyle = '#ffaa00';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(cx, cy, circleRadius, -Math.PI / 2, -Math.PI / 2 + reloadRatio * Math.PI * 2);
-        ctx.stroke();
-    } else {
-        // Ammo clip fill
-        const clipRatio = currentWeapon.currentAmmo / currentWeapon.clipSize;
+        // Draw crosshair - offset based on CURSOR_SIZE to center on actual cursor hotspot
         ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, (CONFIG.CURSOR_SIZE * 1.5), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - (CONFIG.CURSOR_SIZE * 2), cy);
+        ctx.lineTo(cx + (CONFIG.CURSOR_SIZE * 2), cy);
+        ctx.moveTo(cx, cy - (CONFIG.CURSOR_SIZE * 2));
+        ctx.lineTo(cx, cy + (CONFIG.CURSOR_SIZE * 2));
+        ctx.stroke();
+
+        const currentWeapon = game.player.weapons[game.player.weaponIndex];
+        const ammoOffset = CONFIG.CURSOR_SIZE * 3;
+
+        ctx.font = 'bold 14px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.textBaseline = 'middle';
+
+        // Draw health to the left of the crosshair
+        const healthText = `${Math.max(0, Math.floor(game.player.health))}`;
+        ctx.textAlign = 'right';
+        ctx.fillText(healthText, cx - ammoOffset, cy);
+
+        // Draw ammo count to the right of the crosshair
+        const ammoText = `${currentWeapon.currentAmmo}`;
+        ctx.textAlign = 'left';
+        ctx.fillText(ammoText, cx + ammoOffset, cy);
+
+        // Draw reserve ammo below the clip display
+        ctx.font = '12px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillText(currentWeapon.reserveAmmo, cx + ammoOffset, cy + 12);
+
+        // Draw ammo / reload circle around crosshair
+        const circleRadius = CONFIG.CURSOR_SIZE * 2;
+        // Background circle (empty)
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(cx, cy, circleRadius, -Math.PI / 2, -Math.PI / 2 + clipRatio * Math.PI * 2);
+        ctx.arc(cx, cy, circleRadius, 0, Math.PI * 2);
         ctx.stroke();
+        if (currentWeapon.reloading) {
+            // Reload progress
+            const reloadRatio = 1 - (currentWeapon.reloadTimer / currentWeapon.reloadTime);
+            ctx.strokeStyle = '#ffaa00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, circleRadius, -Math.PI / 2, -Math.PI / 2 + reloadRatio * Math.PI * 2);
+            ctx.stroke();
+        } else {
+            // Ammo clip fill
+            const clipRatio = currentWeapon.currentAmmo / currentWeapon.clipSize;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, circleRadius, -Math.PI / 2, -Math.PI / 2 + clipRatio * Math.PI * 2);
+            ctx.stroke();
+        }
     }
 }
 
