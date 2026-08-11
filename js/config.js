@@ -57,7 +57,7 @@ const ZombieTypes = {
             hitParticle: '#888888',
             deathParticle: '#666666'
         },
-        spawnWeight: 10
+        spawnWeight: 50
     },
     demon: {
         name: 'Demon Zombie',
@@ -72,7 +72,7 @@ const ZombieTypes = {
             hitParticle: '#ff0000',
             deathParticle: '#aa0000'
         },
-        spawnWeight: 3
+        spawnWeight: 15
     },
     fast: {
         name: 'Fast Zombie',
@@ -87,7 +87,7 @@ const ZombieTypes = {
             hitParticle: '#ffff00',
             deathParticle: '#ffdd00'
         },
-        spawnWeight: 3
+        spawnWeight: 15
     },
     boomer: {
         name: 'Boomer Zombie',
@@ -103,7 +103,23 @@ const ZombieTypes = {
             hitParticle: '#44aa44',
             deathParticle: '#66cc66'
         },
-        spawnWeight: 2
+        spawnWeight: 10
+    },
+    boss: {
+        name: 'Boss Zombie',
+        speed: 0.65,
+        health: 1000,
+        damage: 50,
+        size: 2.5,
+        colors: {
+            body: '#aa6d44',
+            head: '#634d23',
+            eyes: '#ff0000',
+            healthBar: '#ff0000',
+            hitParticle: '#aa4444',
+            deathParticle: '#632323'
+        },
+        spawnWeight: 1
     }
 };
 
@@ -196,7 +212,7 @@ const WEAPONS = [
         fireRate: 1000,
         reloadTime: 4650,
         bulletSpeed: 25,
-        damage: 100,
+        damage: 120,
         bulletCount: 1,
         spread: 0.005,
         color: "#0000ff",
@@ -211,7 +227,7 @@ const WEAPONS = [
         fireRate: 1000,
         reloadTime: 2100,
         bulletSpeed: 8,
-        damage: 80,
+        damage: 90,
         bulletCount: 1,
         spread: 0.03,
         color: "#888800",
@@ -257,7 +273,7 @@ const WEAPONS = [
         fireRate: 2000,
         reloadTime: 4500,
         bulletSpeed: 7,
-        damage: 150,
+        damage: 300,
         bulletCount: 1,
         spread: 0.02,
         color: "#ff00ff",
