@@ -196,8 +196,8 @@ const WEAPONS = [
         name: "Remington 870 Shotgun",
         clipSize: 8,
         ammo: 80,
-        fireRate: 500,
-        reloadTime: 800,
+        fireRate: 600,
+        reloadTime: 450,
         bulletSpeed: 10,
         damage: 12,
         bulletCount: 8,
@@ -207,6 +207,7 @@ const WEAPONS = [
         sound: "r870",
         description: "Classic zombie killer",
         reloadOneAtATime: true,
+        reloadTimeFirstShell: 900,
         shake: 5.0
     },
     {

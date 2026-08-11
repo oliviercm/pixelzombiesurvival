@@ -691,7 +691,8 @@ function updateUI() {
     // Update weapon info
     const weaponInfo = document.getElementById('weaponInfo');
     const isReloading = weapon.reloading;
-    const reloadProgress = isReloading ? Math.floor((1 - weapon.reloadTimer / weapon.reloadTime) * 100) : 0;
+    const reloadDuration = weapon.reloadShellCount === 0 && weapon.reloadTimeFirstShell ? weapon.reloadTimeFirstShell : weapon.reloadTime;
+    const reloadProgress = isReloading ? Math.floor((1 - weapon.reloadTimer / reloadDuration) * 100) : 0;
 
     let weaponListHTML = `
         <div style="color: ${weapon.color}; font-weight: bold;">${weapon.name}</div>
@@ -908,7 +909,8 @@ function drawGame() {
         ctx.stroke();
         if (currentWeapon.reloading) {
             // Reload progress
-            const reloadRatio = 1 - (currentWeapon.reloadTimer / currentWeapon.reloadTime);
+            const reloadDuration = currentWeapon.reloadShellCount === 0 && currentWeapon.reloadTimeFirstShell ? currentWeapon.reloadTimeFirstShell : currentWeapon.reloadTime;
+            const reloadRatio = 1 - (currentWeapon.reloadTimer / reloadDuration);
             ctx.strokeStyle = '#ffaa00';
             ctx.lineWidth = 3;
             ctx.beginPath();

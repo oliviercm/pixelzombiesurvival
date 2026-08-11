@@ -14,7 +14,7 @@ class FightingCharacter {
         this.health = health;
         this.maxHealth = maxHealth;
         this.weaponIndex = 0;
-        this.weapons = weaponConfigs.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0, reloadOneAtATime: w.reloadOneAtATime, lastShot: 0}));
+        this.weapons = weaponConfigs.map(w => ({...w, currentAmmo: w.clipSize, reserveAmmo: w.ammo, reloading: false, reloadTimer: 0, reloadOffset: 0, reloadOneAtATime: w.reloadOneAtATime, reloadShellCount: 0, lastShot: 0}));
         this.invincibleTimer = 0;
         this.facing = 0;
         this.onDeath = null;
@@ -33,6 +33,7 @@ class FightingCharacter {
                     currentWeapon.currentAmmo += canAdd;
                     currentWeapon.reserveAmmo -= canAdd;
                     if (currentWeapon.currentAmmo < currentWeapon.clipSize && currentWeapon.reserveAmmo > 0) {
+                        currentWeapon.reloadShellCount++;
                         currentWeapon.reloadTimer = currentWeapon.reloadTime;
                         SoundEngine.playReload(currentWeapon.sound + '-reload');
                     } else {
@@ -148,7 +149,8 @@ class FightingCharacter {
         if (weapon.reserveAmmo <= 0) return; // no reserve ammo
         if (weapon.reloading) return; // already reloading
         weapon.reloading = true;
-        weapon.reloadTimer = weapon.reloadTime;
+        weapon.reloadShellCount = 0;
+        weapon.reloadTimer = weapon.reloadTimeFirstShell || weapon.reloadTime;
         weapon.reloadOffset = 0;
         SoundEngine.playReload(weapon.sound + '-reload');
     }

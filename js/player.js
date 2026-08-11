@@ -106,7 +106,8 @@ class Player extends FightingCharacter {
         if (weapon.reserveAmmo <= 0) return; // no reserve ammo
         if (weapon.reloading) return; // already reloading
         weapon.reloading = true;
-        weapon.reloadTimer = weapon.reloadTime;
+        weapon.reloadShellCount = 0;
+        weapon.reloadTimer = weapon.reloadTimeFirstShell || weapon.reloadTime;
         weapon.reloadOffset = 0;
         SoundEngine.playReload(weapon.sound + '-reload');
     }
