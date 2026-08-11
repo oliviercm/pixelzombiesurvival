@@ -19,8 +19,8 @@ class Zombie {
             this.height = CONFIG.ZOMBIE_SIZE;
         }
         
-        // Apply stats from configuration
-        this.speed = zombieConfig.speed;
+        // Apply stats from configuration with +/- 10% speed variation
+        this.speed = zombieConfig.speed * (0.9 + Math.random() * 0.2);
         const healthVariation = 0.8 + Math.random() * 0.4;
         this.health = Math.round(zombieConfig.health * healthVariation);
         this.maxHealth = this.health;
