@@ -175,6 +175,9 @@ class Player extends FightingCharacter {
             }
         }
 
+        // Trigger screen shake
+        triggerShake(weapon.shake || 1);
+
         // Emit shell casing from the weapon
         const shellDef = SHELL_TYPES[weapon.sound];
         if (shellDef) {

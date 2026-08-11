@@ -24,6 +24,7 @@ let game = {
     mouseY: 0,
     mouseClick: false,
     camera: { x: 0, y: 0 },
+    shake: { intensity: 0, decay: 0.9 },
     worldWidth: 1800,
     worldHeight: 1200,
     lastFrameTime: 0,
@@ -180,6 +181,18 @@ function updateCamera() {
     // Clamp camera to world bounds
     game.camera.x = Math.max(0, Math.min(game.worldWidth - CONFIG.CANVAS_WIDTH, game.camera.x));
     game.camera.y = Math.max(0, Math.min(game.worldHeight - CONFIG.CANVAS_HEIGHT, game.camera.y));
+}
+
+function triggerShake(intensity) {
+    game.shake.intensity = game.shake.intensity + intensity;
+}
+
+function updateShake() {
+    if (game.shake.intensity > 0.1) {
+        game.shake.intensity *= game.shake.decay;
+    } else {
+        game.shake.intensity = 0;
+    }
 }
 
 /**
@@ -612,6 +625,12 @@ function updateUI() {
 function drawGame() {
     const ctx = game.ctx;
 
+    // Apply screen shake offset
+    const shakeX = (Math.random() - 0.5) * 2 * Math.min(game.shake.intensity, 8);
+    const shakeY = (Math.random() - 0.5) * 2 * Math.min(game.shake.intensity, 8);
+    game.camera.x += shakeX;
+    game.camera.y += shakeY;
+
     // Clear and draw background
     drawBackground();
 
@@ -902,6 +921,9 @@ function gameLoop(timestamp) {
 
     // Update UI
     updateUI();
+
+    // Update shake
+    updateShake();
 
     // Continue game loop
     requestAnimationFrame(gameLoop);

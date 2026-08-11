@@ -157,7 +157,8 @@ const WEAPONS = [
         color: "#888888",
         bulletSize: 3,
         sound: "glock",
-        description: "Reliable sidearm"
+        description: "Reliable sidearm",
+        shake: 1.5
     },
     {
         name: "AK-47 Assault Rifle",
@@ -172,7 +173,8 @@ const WEAPONS = [
         color: "#ff6600",
         bulletSize: 3,
         sound: "ak47",
-        description: "Automatic rifle"
+        description: "Automatic rifle",
+        shake: 2.0
     },
     {
         name: "MP5 Submachine Gun",
@@ -187,7 +189,8 @@ const WEAPONS = [
         color: "#00ff00",
         bulletSize: 2,
         sound: "mp5",
-        description: "High rate of fire"
+        description: "High rate of fire",
+        shake: 1.0
     },
     {
         name: "Remington 870 Shotgun",
@@ -203,7 +206,8 @@ const WEAPONS = [
         bulletSize: 2,
         sound: "r870",
         description: "Classic zombie killer",
-        reloadOneAtATime: true
+        reloadOneAtATime: true,
+        shake: 5.0
     },
     {
         name: "Barrett M82A1 Sniper",
@@ -218,7 +222,8 @@ const WEAPONS = [
         color: "#0000ff",
         bulletSize: 4,
         sound: "barretm82",
-        description: "Long-range precision"
+        description: "Long-range precision",
+        shake: 8.0
     },
     {
         name: "M79 Grenade Launcher",
@@ -234,7 +239,8 @@ const WEAPONS = [
         bulletSize: 6,
         explosionRadius: 75,
         sound: "m79",
-        description: "Explosive ordnance"
+        description: "Explosive ordnance",
+        shake: 4.0
     },
     {
         name: "AA-12 Assault Shotgun",
@@ -249,7 +255,8 @@ const WEAPONS = [
         color: "#cc6600",
         bulletSize: 2,
         sound: "aa12",
-        description: "Close-range devastation"
+        description: "Close-range devastation",
+        shake: 5.0
     },
     {
         name: "M249 Light Machine Gun",
@@ -264,7 +271,8 @@ const WEAPONS = [
         color: "#ffff00",
         bulletSize: 3,
         sound: "m249",
-        description: "Sustained fire"
+        description: "Sustained fire",
+        shake: 2.2
     },
     {
         name: "M72 LAW Rocket Launcher",
@@ -288,7 +296,8 @@ const WEAPONS = [
             speedMax: 2.0
         },
         sound: "law",
-        description: "Heavy anti-armor weapon"
+        description: "Heavy anti-armor weapon",
+        shake: 10.0
     },
     {
         name: "M134 Minigun",
@@ -303,6 +312,7 @@ const WEAPONS = [
         color: "#00ffff",
         bulletSize: 3,
         sound: "minigun",
-        description: "Hail of bullets"
+        description: "Hail of bullets",
+        shake: 2.0
     }
 ];
