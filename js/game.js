@@ -223,6 +223,25 @@ function updateBullets(deltaTime) {
         bullet.y += bullet.vy * timeScale;
         bullet.life -= deltaTime;
 
+        // Particle trail
+        if (bullet.trail) {
+            const trail = bullet.trail;
+            const smokeAngle = Math.atan2(-bullet.vy, -bullet.vx) + (Math.random() - 0.5) * 1.0;
+            const smokeSpeed = Math.random() * (trail.speedMax - trail.speedMin) + trail.speedMin;
+            game.particles.push({
+                x: bullet.x + (Math.random() - 0.5) * 6,
+                y: bullet.y + (Math.random() - 0.5) * 6,
+                vx: Math.cos(smokeAngle) * smokeSpeed,
+                vy: Math.sin(smokeAngle) * smokeSpeed,
+                size: Math.random() * (trail.sizeMax - trail.sizeMin) + trail.sizeMin,
+                color: trail.color,
+                life: trail.life,
+                maxLife: trail.life,
+                useDecay: true,
+                layer: 1
+            });
+        }
+
         // Remove expired bullets
         if (bullet.life <= 0) {
             game.bullets.splice(i, 1);
@@ -639,6 +658,20 @@ function drawGame() {
     // Draw NPCs
     game.npcs.forEach(npc => npc.draw(ctx));
 
+    // Draw low-layer particles (behind bullets)
+    game.particles.forEach(particle => {
+        if (!particle.isSplatter && !particle.isShell && (particle.layer ?? 2) < 2) {
+            const screenX = particle.x - game.camera.x;
+            const screenY = particle.y - game.camera.y;
+            const lifeRatio = particle.life / particle.maxLife;
+
+            ctx.globalAlpha = lifeRatio;
+            ctx.fillStyle = particle.color;
+            ctx.fillRect(screenX - particle.size/2, screenY - particle.size/2, particle.size, particle.size);
+            ctx.globalAlpha = 1;
+        }
+    });
+
     // Draw bullets
     game.bullets.forEach(bullet => {
         const screenX = bullet.x - game.camera.x;
@@ -654,6 +687,20 @@ function drawGame() {
         ctx.beginPath();
         ctx.arc(screenX - bullet.vx, screenY - bullet.vy, bullet.size * 0.7, 0, Math.PI * 2);
         ctx.fill();
+    });
+
+    // Draw high-layer particles (on top of everything)
+    game.particles.forEach(particle => {
+        if (!particle.isSplatter && !particle.isShell && (particle.layer ?? 2) >= 2) {
+            const screenX = particle.x - game.camera.x;
+            const screenY = particle.y - game.camera.y;
+            const lifeRatio = particle.life / particle.maxLife;
+
+            ctx.globalAlpha = lifeRatio;
+            ctx.fillStyle = particle.color;
+            ctx.fillRect(screenX - particle.size/2, screenY - particle.size/2, particle.size, particle.size);
+            ctx.globalAlpha = 1;
+        }
     });
 
     // Draw explosions
@@ -675,20 +722,6 @@ function drawGame() {
         ctx.fill();
     });
     ctx.globalAlpha = 1;
-
-    // Draw regular particles (on top of everything)
-    game.particles.forEach(particle => {
-        if (!particle.isSplatter && !particle.isShell) {
-            const screenX = particle.x - game.camera.x;
-            const screenY = particle.y - game.camera.y;
-            const lifeRatio = particle.life / particle.maxLife;
-
-            ctx.globalAlpha = lifeRatio;
-            ctx.fillStyle = particle.color;
-            ctx.fillRect(screenX - particle.size/2, screenY - particle.size/2, particle.size, particle.size);
-            ctx.globalAlpha = 1;
-        }
-    });
 
     // Draw aiming line from gun barrel to crosshair (fades near crosshair)
     const playerScreenX = game.player.x - game.camera.x;

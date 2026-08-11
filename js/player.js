@@ -154,6 +154,7 @@ class Player extends FightingCharacter {
                 color: weapon.color,
                 life: 3000, // bullets last 3 seconds
                 explosionRadius: weapon.explosionRadius || 0,
+                trail: weapon.trail || null,
                 isExploding: false,
                 sound: weapon.sound // for sound context
             };

@@ -279,6 +279,14 @@ const WEAPONS = [
         color: "#ff00ff",
         bulletSize: 8,
         explosionRadius: 140,
+        trail: {
+            color: '#999999',
+            life: 1500,
+            sizeMin: 3,
+            sizeMax: 8,
+            speedMin: 0.5,
+            speedMax: 2.0
+        },
         sound: "law",
         description: "Heavy anti-armor weapon"
     },
