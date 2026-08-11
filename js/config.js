@@ -119,7 +119,7 @@ const SHELL_TYPES = {
     m249:     { width: 2, height: 5,  color: '#ffd700' },
     minigun:  { width: 2, height: 5,  color: '#ffd700' },
     r870:     { width: 3, height: 5,  color: '#ff4444' },
-    mossberg: { width: 4, height: 6,  color: '#ff4444' },
+    aa12: { width: 4, height: 6,  color: '#ff4444' },
     m79:      { width: 5, height: 5,  color: '#b8860b' },
     law:      { width: 15, height: 6, color: '#888888' }
 };
@@ -182,17 +182,17 @@ const WEAPONS = [
         bulletSpeed: 10,
         damage: 12,
         bulletCount: 8,
-        spread: 0.15,
+        spread: 0.10,
         color: "#ff0000",
         bulletSize: 2,
         sound: "r870",
-        description: "Close-range devastation",
+        description: "Classic zombie killer",
         reloadOneAtATime: true
     },
     {
         name: "Barrett M82A1 Sniper",
         clipSize: 10,
-        ammo: 50,
+        ammo: 40,
         fireRate: 1000,
         reloadTime: 4650,
         bulletSpeed: 25,
@@ -221,20 +221,19 @@ const WEAPONS = [
         description: "Explosive ordnance"
     },
     {
-        name: "Mossberg 500 Shotgun",
-        clipSize: 5,
+        name: "AA-12 Assault Shotgun",
+        clipSize: 20,
         ammo: 60,
-        fireRate: 600,
-        reloadTime: 1000,
+        fireRate: 200,
+        reloadTime: 4000,
         bulletSpeed: 10,
-        damage: 15,
+        damage: 8,
         bulletCount: 10,
         spread: 0.20,
         color: "#cc6600",
         bulletSize: 2,
-        sound: "mossberg",
-        description: "Pump-action power",
-        reloadOneAtATime: true
+        sound: "aa12",
+        description: "Close-range devastation"
     },
     {
         name: "M249 Light Machine Gun",
